@@ -22,3 +22,38 @@ C:\Users\grigorev\Desktop\Igor's projects\Projects\FaultIndicator_MainIPConfig\F
 C:\Users\grigorev\Desktop\Igor's projects\Projects\FaultIndicator_MainIPConfig\FaultIndicator_MainIPConfig\obj\Debug\net6.0-windows\FaultIndicator_MainIPConfig.genruntimeconfig.cache
 C:\Users\grigorev\Desktop\Igor's projects\Projects\FaultIndicator_MainIPConfig\FaultIndicator_MainIPConfig\obj\Debug\net6.0-windows\ref\FaultIndicator_MainIPConfig.dll
 C:\Users\grigorev\Desktop\Igor's projects\Projects\FaultIndicator_MainIPConfig\FaultIndicator_MainIPConfig\obj\Debug\net6.0-windows\App.baml
+C:\git\FaultIndicator_MainIPConfig\FaultIndicator_MainIPConfig\bin\Debug\net6.0-windows\FaultIndicator_MainIPConfig.exe
+C:\git\FaultIndicator_MainIPConfig\FaultIndicator_MainIPConfig\bin\Debug\net6.0-windows\FaultIndicator_MainIPConfig.deps.json
+C:\git\FaultIndicator_MainIPConfig\FaultIndicator_MainIPConfig\bin\Debug\net6.0-windows\FaultIndicator_MainIPConfig.runtimeconfig.json
+C:\git\FaultIndicator_MainIPConfig\FaultIndicator_MainIPConfig\bin\Debug\net6.0-windows\FaultIndicator_MainIPConfig.dll
+C:\git\FaultIndicator_MainIPConfig\FaultIndicator_MainIPConfig\bin\Debug\net6.0-windows\FaultIndicator_MainIPConfig.pdb
+C:\git\FaultIndicator_MainIPConfig\FaultIndicator_MainIPConfig\obj\Debug\net6.0-windows\FaultIndicator_MainIPConfig.csproj.AssemblyReference.cache
+C:\git\FaultIndicator_MainIPConfig\FaultIndicator_MainIPConfig\obj\Debug\net6.0-windows\Themes\DarkTheme.baml
+C:\git\FaultIndicator_MainIPConfig\FaultIndicator_MainIPConfig\obj\Debug\net6.0-windows\MainWindow.g.cs
+C:\git\FaultIndicator_MainIPConfig\FaultIndicator_MainIPConfig\obj\Debug\net6.0-windows\Themes\DarkTheme.g.cs
+C:\git\FaultIndicator_MainIPConfig\FaultIndicator_MainIPConfig\obj\Debug\net6.0-windows\App.g.cs
+C:\git\FaultIndicator_MainIPConfig\FaultIndicator_MainIPConfig\obj\Debug\net6.0-windows\FaultIndicator_MainIPConfig_MarkupCompile.cache
+C:\git\FaultIndicator_MainIPConfig\FaultIndicator_MainIPConfig\obj\Debug\net6.0-windows\FaultIndicator_MainIPConfig_MarkupCompile.lref
+C:\git\FaultIndicator_MainIPConfig\FaultIndicator_MainIPConfig\obj\Debug\net6.0-windows\App.baml
+C:\git\FaultIndicator_MainIPConfig\FaultIndicator_MainIPConfig\obj\Debug\net6.0-windows\MainWindow.baml
+C:\git\FaultIndicator_MainIPConfig\FaultIndicator_MainIPConfig\obj\Debug\net6.0-windows\FaultIndicator_MainIPConfig.g.resources
+C:\git\FaultIndicator_MainIPConfig\FaultIndicator_MainIPConfig\obj\Debug\net6.0-windows\FaultIndicator_MainIPConfig.GeneratedMSBuildEditorConfig.editorconfig
+C:\git\FaultIndicator_MainIPConfig\FaultIndicator_MainIPConfig\obj\Debug\net6.0-windows\FaultIndicator_MainIPConfig.AssemblyInfoInputs.cache
+C:\git\FaultIndicator_MainIPConfig\FaultIndicator_MainIPConfig\obj\Debug\net6.0-windows\FaultIndicator_MainIPConfig.AssemblyInfo.cs
+C:\git\FaultIndicator_MainIPConfig\FaultIndicator_MainIPConfig\obj\Debug\net6.0-windows\FaultIndicator_MainIPConfig.csproj.CoreCompileInputs.cache
+C:\git\FaultIndicator_MainIPConfig\FaultIndicator_MainIPConfig\obj\Debug\net6.0-windows\FaultIndicator_MainIPConfig.dll
+C:\git\FaultIndicator_MainIPConfig\FaultIndicator_MainIPConfig\obj\Debug\net6.0-windows\refint\FaultIndicator_MainIPConfig.dll
+C:\git\FaultIndicator_MainIPConfig\FaultIndicator_MainIPConfig\obj\Debug\net6.0-windows\FaultIndicator_MainIPConfig.pdb
+C:\git\FaultIndicator_MainIPConfig\FaultIndicator_MainIPConfig\obj\Debug\net6.0-windows\FaultIndicator_MainIPConfig.genruntimeconfig.cache
+C:\git\FaultIndicator_MainIPConfig\FaultIndicator_MainIPConfig\obj\Debug\net6.0-windows\ref\FaultIndicator_MainIPConfig.dll
+C:\git\FaultIndicator_MainIPConfig\FaultIndicator_MainIPConfig\obj\Debug\net6.0-windows\GeneratedInternalTypeHelper.g.cs
+C:\git\FaultIndicator_MainIPConfig\FaultIndicator_MainIPConfig\bin\Debug\net6.0-windows\Microsoft.Xaml.Behaviors.dll
+C:\git\FaultIndicator_MainIPConfig\FaultIndicator_MainIPConfig\bin\Debug\net6.0-windows\System.IO.Ports.dll
+C:\git\FaultIndicator_MainIPConfig\FaultIndicator_MainIPConfig\bin\Debug\net6.0-windows\runtimes\linux-arm\native\libSystem.IO.Ports.Native.so
+C:\git\FaultIndicator_MainIPConfig\FaultIndicator_MainIPConfig\bin\Debug\net6.0-windows\runtimes\linux-arm64\native\libSystem.IO.Ports.Native.so
+C:\git\FaultIndicator_MainIPConfig\FaultIndicator_MainIPConfig\bin\Debug\net6.0-windows\runtimes\linux-x64\native\libSystem.IO.Ports.Native.so
+C:\git\FaultIndicator_MainIPConfig\FaultIndicator_MainIPConfig\bin\Debug\net6.0-windows\runtimes\osx-arm64\native\libSystem.IO.Ports.Native.dylib
+C:\git\FaultIndicator_MainIPConfig\FaultIndicator_MainIPConfig\bin\Debug\net6.0-windows\runtimes\osx-x64\native\libSystem.IO.Ports.Native.dylib
+C:\git\FaultIndicator_MainIPConfig\FaultIndicator_MainIPConfig\bin\Debug\net6.0-windows\runtimes\unix\lib\net6.0\System.IO.Ports.dll
+C:\git\FaultIndicator_MainIPConfig\FaultIndicator_MainIPConfig\bin\Debug\net6.0-windows\runtimes\win\lib\net6.0\System.IO.Ports.dll
+C:\git\FaultIndicator_MainIPConfig\FaultIndicator_MainIPConfig\obj\Debug\net6.0-windows\FaultIndicator_MainIPConfig.csproj.CopyComplete

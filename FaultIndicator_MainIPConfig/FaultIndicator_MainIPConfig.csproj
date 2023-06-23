@@ -5,9 +5,19 @@
     <TargetFramework>net6.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
+	<SupportedOSPlatformVersion>7.0</SupportedOSPlatformVersion>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="UI\FaultIndicatorValuesValidationRule.cs" />
+  </ItemGroup>
+
 	<ItemGroup>
-		<Folder Include="Themes\"/>
+		<PackageReference Include="Microsoft.xaml.Behaviors.Wpf" Version="1.1.39" />
+		<PackageReference Include="System.IO.Ports" Version="7.0.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Folder Include="Themes\" />
 	</ItemGroup>
 </Project>
