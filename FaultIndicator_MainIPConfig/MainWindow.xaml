@@ -3,12 +3,168 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:System="clr-namespace:System;assembly=mscorlib"
+        xmlns:viewmodels="clr-namespace:FaultIndicator_MainIPConfig.ViewModels"
+        xmlns:Converters="clr-namespace:FaultIndicator_MainIPConfig.Converters"
+        xmlns:settings="clr-namespace:FaultIndicator_MainIPConfig.SerialPortDevice"
         xmlns:local="clr-namespace:FaultIndicator_MainIPConfig"
+        xmlns:UI="clr-namespace:FaultIndicator_MainIPConfig.UI"
         mc:Ignorable="d"
-        Title="Конфигурация магистральных ИКЗ" Height="450" Width="800"
+        Closing="Window_Closing"
+        Title="Конфигурация магистральных ИКЗ" 
+        Height="450" Width="800"
         MinHeight="450" MinWidth="800"
         Style="{DynamicResource CustomWindowStyle}">
+    <Window.Resources>
+        <Converters:BoolToColourConverter x:Key="BoolToColourConverter"/>
+        <Converters:BoolToIsConnectedConverter x:Key="BoolToIsConnectedConverter"/>
+        <Converters:ZeroToEmptyStringConverter x:Key="ZeroToEmptyStringConverter"/>
+    </Window.Resources>
+    <Window.DataContext>
+        <viewmodels:MainViewModel/>
+    </Window.DataContext>
     <Grid>
-        <Button Content="Flex" Margin="150"/>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200*"/>
+            <ColumnDefinition Width="600*"/>
+        </Grid.ColumnDefinitions>
+        <Grid DataContext="{Binding}" Grid.Column="0">
+            <Grid.Resources>
+                <x:Array x:Key="baudRates" Type="{x:Type System:String}">
+                    <System:String>110</System:String>
+                    <System:String>330</System:String>
+                    <System:String>600</System:String>
+                    <System:String>1200</System:String>
+                    <System:String>2400</System:String>
+                    <System:String>4800</System:String>
+                    <System:String>9600</System:String>
+                    <System:String>19200</System:String>
+                    <System:String>38400</System:String>
+                    <System:String>57600</System:String>
+                    <System:String>74800</System:String>
+                    <System:String>115200</System:String>
+                    <System:String>128000</System:String>
+                    <System:String>256000</System:String>
+                </x:Array>
+            </Grid.Resources>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="35*"/>
+                <RowDefinition Height="35*"/>
+                <RowDefinition Height="35*"/>
+                <RowDefinition Height="35*"/>
+                <RowDefinition Height="35*"/>
+                <RowDefinition Height="35*"/>
+                <RowDefinition Height="25*"/>
+            </Grid.RowDefinitions>
+            <TextBlock Text="COM-порт:" VerticalAlignment="Center" Margin="10,0,0,0" Grid.Row="0"/>
+            <ComboBox x:Name="COMPortsComboBox" HorizontalAlignment="Left" Margin="90,0,0,0" Width="80" VerticalAlignment="Center" 
+                      ItemsSource="{Binding SerialPort.Settings.AvaliablePorts, Mode=OneTime}"
+                      SelectedItem="{Binding SerialPort.Settings.SelectedCOMPort, UpdateSourceTrigger=PropertyChanged, Mode=OneWayToSource}"
+                      Grid.Row="0"/>
+            <TextBlock Text="Скорость:" VerticalAlignment="Center" Margin="10,0,0,0" Grid.Row="1"/>
+            <ComboBox x:Name="COMBaudRateComboBox" HorizontalAlignment="Left" Margin="90,0,0,0" Width="80" VerticalAlignment="Center"
+                      SelectedIndex="11"
+                      ItemsSource="{StaticResource baudRates}"
+                      SelectedItem="{Binding SerialPort.Settings.SelectedBaudRate, UpdateSourceTrigger=PropertyChanged, Mode=OneWayToSource}"
+                      Grid.Row="1"/>
+            <Button x:Name="COMOpenClosePortMainButton"
+                    Background="{Binding SerialPort.IsConnected, Converter={StaticResource BoolToColourConverter}}"
+                    Command="{Binding SerialPort.AutoConnectDisconnectCommand, Mode=OneTime}"
+                    Content="{Binding SerialPort.IsConnected, Converter={StaticResource BoolToIsConnectedConverter}, UpdateSourceTrigger=PropertyChanged}" 
+                    Margin="0" Grid.Row="2"/>
+            <Button x:Name="COMRResetButton" Content="Обновить порты" IsEnabled="{Binding SerialPort.Settings.CanEditControls}"
+                    Command="{Binding SerialPort.Settings.RefreshPortsCommand, Mode=OneTime}"
+                    Cursor="Hand" Margin="0" Grid.Row="3"/>
+            <Button Content="Чтение данных" Margin="0" Grid.Row="4"/>
+            <Button Content="Запись данных" Margin="0" Grid.Row="5"/>
+            <Button x:Name="ConsoleBoxClearButton" 
+                    Command="{Binding Messages.ClearMessagesCommand}"
+                    Content="Очистить лог" Margin="0" Grid.Row="6"/>
+        </Grid>
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="300*"/>
+                <RowDefinition Height="170*"/>
+            </Grid.RowDefinitions>
+            <GroupBox Header="Значения параметров связи">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="300*"/>
+                        <ColumnDefinition Width="300*"/>
+                    </Grid.ColumnDefinitions>
+                    <GroupBox Header="Параметры 1 сим-карты" Grid.Column="0">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="35*"/>
+                                <RowDefinition Height="35*"/>
+                                <RowDefinition Height="35*"/>
+                                <RowDefinition Height="35*"/>
+                                <RowDefinition Height="35*"/>
+                                <RowDefinition Height="35*"/>
+                                <RowDefinition Height="35*"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock x:Name="FirstRemoteIPAddress" HorizontalAlignment="Left" TextWrapping="Wrap" Margin="5,0,0,0" Text="Удалённый IP-Адрес" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="FirstRemotePort" HorizontalAlignment="Left" TextWrapping="Wrap" Margin="5,0,0,0" Text="Удалённый порт" VerticalAlignment="Center" Grid.Row="1"/>
+                            <TextBlock x:Name="FirstSIMCSQ" HorizontalAlignment="Left" TextWrapping="Wrap" Margin="5" Text="Качество уровня сигнала (CSQ)" VerticalAlignment="Center" Grid.Row="2"/>
+                            <TextBlock x:Name="FirstSIMAPN" HorizontalAlignment="Left" TextWrapping="Wrap" Margin="5" Text="Имя точки доступа (APN)" VerticalAlignment="Center" Grid.Row="3"/>
+                            <TextBlock x:Name="FirstSIMIPAddress" HorizontalAlignment="Left" TextWrapping="Wrap" Margin="5,0,0,0" Text="IP-Адрес SIM-карты" VerticalAlignment="Center" Grid.Row="4"/>
+                            <TextBlock x:Name="FirstSIMUsername" HorizontalAlignment="Left" TextWrapping="Wrap" Margin="5,0,0,0" Text="Имя пользователя" VerticalAlignment="Center" Grid.Row="5"/>
+                            <TextBlock x:Name="FirstSIMPassword" HorizontalAlignment="Left" TextWrapping="Wrap" Margin="5,0,0,0" Text="Пароль" VerticalAlignment="Center" Grid.Row="6"/>
+                            <TextBox x:Name="FirstRemoteIPAddresstextBox" BorderBrush="#FF2A2A2A" HorizontalAlignment="Right" TextWrapping="Wrap" Text="{Binding IndicatorData.CallAdress, TargetNullValue='', StringFormat=d, UpdateSourceTrigger=PropertyChanged}" UI:Masking.Mask="^[0-9]+$" VerticalAlignment="Center" Width="140" Grid.Row="0" Margin="0,0,10,0"/>
+                            <TextBox x:Name="FirstRemotePorttextBox" BorderBrush="#FF2A2A2A" HorizontalAlignment="Right" TextWrapping="Wrap" Text="{Binding IndicatorData.CallFrequency, TargetNullValue='', StringFormat=d, UpdateSourceTrigger=PropertyChanged}" UI:Masking.Mask="^[0-9]+$" VerticalAlignment="Center" Width="80" Grid.Row="1" Margin="0,0,10,0"/>
+                            <TextBox x:Name="FirstSIMCSQtextBox" BorderBrush="#FF2A2A2A" HorizontalAlignment="Right" TextWrapping="Wrap" Text="{Binding IndicatorData.CallTime, TargetNullValue='', StringFormat=d, UpdateSourceTrigger=PropertyChanged}" UI:Masking.Mask="^[0-9]+$" VerticalAlignment="Center" Width="80" Grid.Row="2" Margin="0,0,10,0"/>
+                            <TextBox x:Name="FirstSIMAPNtextBox" BorderBrush="#FF2A2A2A" HorizontalAlignment="Right" TextWrapping="Wrap" Text="{Binding IndicatorData.WaitTime, TargetNullValue='', StringFormat=d, UpdateSourceTrigger=PropertyChanged}" UI:Masking.Mask="^[0-9]+$" VerticalAlignment="Center" Width="80" Grid.Row="3" Margin="0,0,10,0"/>
+                            <TextBox x:Name="FirstSIMIPAddresstextBox" BorderBrush="#FF2A2A2A" HorizontalAlignment="Right" TextWrapping="Wrap" Text="{Binding IndicatorData.CallFrequency, TargetNullValue='', StringFormat=d, UpdateSourceTrigger=PropertyChanged}" UI:Masking.Mask="^[0-9]+$" VerticalAlignment="Center" Width="80" Grid.Row="4" Margin="0,0,10,0"/>
+                            <TextBox x:Name="FirstSIMUsernametextBox" BorderBrush="#FF2A2A2A" HorizontalAlignment="Right" TextWrapping="Wrap" Text="{Binding IndicatorData.CallTime, TargetNullValue='', StringFormat=d, UpdateSourceTrigger=PropertyChanged}" UI:Masking.Mask="^[0-9]+$" VerticalAlignment="Center" Width="80" Grid.Row="5" Margin="0,0,10,0"/>
+                            <TextBox x:Name="FirstSIMPasswordtextBox" BorderBrush="#FF2A2A2A" HorizontalAlignment="Right" TextWrapping="Wrap" Text="{Binding IndicatorData.WaitTime, TargetNullValue='', StringFormat=d, UpdateSourceTrigger=PropertyChanged}" UI:Masking.Mask="^[0-9]+$" VerticalAlignment="Center" Width="80" Grid.Row="6" Margin="0,0,10,0"/>
+                        </Grid>
+                    </GroupBox>
+                    <GroupBox Header="Параметры 2 сим-карты" Grid.Column="1">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="35*"/>
+                                <RowDefinition Height="35*"/>
+                                <RowDefinition Height="35*"/>
+                                <RowDefinition Height="35*"/>
+                                <RowDefinition Height="35*"/>
+                                <RowDefinition Height="35*"/>
+                                <RowDefinition Height="35*"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock x:Name="SecondRemoteIPAddress" HorizontalAlignment="Left" TextWrapping="Wrap" Margin="5,0,0,0" Text="Удалённый IP-Адрес" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="SecondRemotePort" HorizontalAlignment="Left" TextWrapping="Wrap" Margin="5,0,0,0" Text="Удалённый порт" VerticalAlignment="Center" Grid.Row="1"/>
+                            <TextBlock x:Name="SecondSIMCSQ" HorizontalAlignment="Left" TextWrapping="Wrap" Margin="5" Text="Качество уровня сигнала (CSQ)" VerticalAlignment="Center" Grid.Row="2"/>
+                            <TextBlock x:Name="SecondSIMAPN" HorizontalAlignment="Left" TextWrapping="Wrap" Margin="5" Text="Имя точки доступа (APN)" VerticalAlignment="Center" Grid.Row="3"/>
+                            <TextBlock x:Name="SecondSIMIPAddress" HorizontalAlignment="Left" TextWrapping="Wrap" Margin="5,0,0,0" Text="IP-Адрес SIM-карты" VerticalAlignment="Center" Grid.Row="4"/>
+                            <TextBlock x:Name="SecondSIMUsername" HorizontalAlignment="Left" TextWrapping="Wrap" Margin="5,0,0,0" Text="Имя пользователя" VerticalAlignment="Center" Grid.Row="5"/>
+                            <TextBlock x:Name="SecondSIMPassword" HorizontalAlignment="Left" TextWrapping="Wrap" Margin="5,0,0,0" Text="Пароль" VerticalAlignment="Center" Grid.Row="6"/>
+                            <TextBox x:Name="SecondRemoteIPAddresstextBox" BorderBrush="#FF2A2A2A" HorizontalAlignment="Right" TextWrapping="Wrap" Text="{Binding IndicatorData.CallAdress, TargetNullValue='', StringFormat=d, UpdateSourceTrigger=PropertyChanged}" UI:Masking.Mask="^[0-9]+$" VerticalAlignment="Center" Width="140" Grid.Row="0" Margin="0,0,10,0"/>
+                            <TextBox x:Name="SecondRemotePorttextBox" BorderBrush="#FF2A2A2A" HorizontalAlignment="Right" TextWrapping="Wrap" Text="{Binding IndicatorData.CallFrequency, TargetNullValue='', StringFormat=d, UpdateSourceTrigger=PropertyChanged}" UI:Masking.Mask="^[0-9]+$" VerticalAlignment="Center" Width="80" Grid.Row="1" Margin="0,0,10,0"/>
+                            <TextBox x:Name="SecondSIMCSQtextBox" BorderBrush="#FF2A2A2A" HorizontalAlignment="Right" TextWrapping="Wrap" Text="{Binding IndicatorData.CallTime, TargetNullValue='', StringFormat=d, UpdateSourceTrigger=PropertyChanged}" UI:Masking.Mask="^[0-9]+$" VerticalAlignment="Center" Width="80" Grid.Row="2" Margin="0,0,10,0"/>
+                            <TextBox x:Name="SecondSIMAPNtextBox" BorderBrush="#FF2A2A2A" HorizontalAlignment="Right" TextWrapping="Wrap" Text="{Binding IndicatorData.WaitTime, TargetNullValue='', StringFormat=d, UpdateSourceTrigger=PropertyChanged}" UI:Masking.Mask="^[0-9]+$" VerticalAlignment="Center" Width="80" Grid.Row="3" Margin="0,0,10,0"/>
+                            <TextBox x:Name="SecondSIMIPAddresstextBox" BorderBrush="#FF2A2A2A" HorizontalAlignment="Right" TextWrapping="Wrap" Text="{Binding IndicatorData.CallFrequency, TargetNullValue='', StringFormat=d, UpdateSourceTrigger=PropertyChanged}" UI:Masking.Mask="^[0-9]+$" VerticalAlignment="Center" Width="80" Grid.Row="4" Margin="0,0,10,0"/>
+                            <TextBox x:Name="SecondSIMUsernametextBox" BorderBrush="#FF2A2A2A" HorizontalAlignment="Right" TextWrapping="Wrap" Text="{Binding IndicatorData.CallTime, TargetNullValue='', StringFormat=d, UpdateSourceTrigger=PropertyChanged}" UI:Masking.Mask="^[0-9]+$" VerticalAlignment="Center" Width="80" Grid.Row="5" Margin="0,0,10,0"/>
+                            <TextBox x:Name="SecondSIMPasswordtextBox" BorderBrush="#FF2A2A2A" HorizontalAlignment="Right" TextWrapping="Wrap" Text="{Binding IndicatorData.WaitTime, TargetNullValue='', StringFormat=d, UpdateSourceTrigger=PropertyChanged}" UI:Masking.Mask="^[0-9]+$" VerticalAlignment="Center" Width="80" Grid.Row="6" Margin="0,0,10,0"/>
+                        </Grid>
+                    </GroupBox>
+                </Grid>
+            </GroupBox>
+            <GroupBox Header="Сообщения" Grid.Row="1">
+                <Grid>
+                    <TextBox
+                        x:Name="consoleBox"
+                        TextWrapping="Wrap" 
+                        VerticalScrollBarVisibility="Auto" 
+                        HorizontalScrollBarVisibility="Visible"
+                        Text="{Binding Messages.MessagesText, UpdateSourceTrigger=PropertyChanged}"
+                        AcceptsReturn="False"
+                        AcceptsTab="False"
+                        FontSize="12"
+                        IsReadOnly="true"
+                        Margin="0,0,0,0"/>
+                    <!--Text="{Binding Messages.MessagesText, UpdateSourceTrigger=PropertyChanged}"-->
+                    <!--attached:HorizontalScrolling.UseHorizontalScrollingValue="True-->
+                </Grid>
+            </GroupBox>
+        </Grid>
     </Grid>
 </Window>
