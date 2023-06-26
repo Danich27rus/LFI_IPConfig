@@ -27,6 +27,7 @@ namespace FaultIndicator_MainIPConfig.SerialPMessages
         //public SerialPortMessagesViewModel SerialPortModel { get; set; }
         public SerialPort Port { get; set; }
         public SerialPortMessagesViewModel Messages { get; set; }
+        public BlockDataViewModel BaseBlock { get; set; }
         //public IndicatorDataViewModel IndicatorData { get; set; }
         public SerialPortMessagesReceive() 
         {
@@ -79,8 +80,8 @@ namespace FaultIndicator_MainIPConfig.SerialPMessages
                                 if (Port.BytesToRead == 0 && Messages.IsHEX)
                                 {
                                     //message = hexConverter.ToHexString(message);
-                                    //IndicatorData.IndicatorConfirm = message;
-                                    //IndicatorData.ParseCommand();
+                                    BaseBlock.BlockResponse = message;
+                                    BaseBlock.ParseCommand();
                                     Messages.AddReceivedMessage(message);
                                     message = "";
                                 }
@@ -107,7 +108,7 @@ namespace FaultIndicator_MainIPConfig.SerialPMessages
                         }
                     }
                 }
-                Thread.Sleep(1);
+                Thread.Sleep(25);
             }
             //Dispatcher.Thread.Interrupt();
         }

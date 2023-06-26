@@ -10,18 +10,17 @@ using FaultIndicator_MainIPConfig.UI;
 //using test_app2.FaultIndicators;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using FaultIndicator_MainIPConfig.BaseBlock;
 
 namespace FaultIndicator_MainIPConfig.ViewModels
 {
     internal class MainViewModel
     { 
-        //19 00 00 04 08 00 00 00 00 00 00 F4 8B
-        //тест для последовательного порта через КДТН
         public SerialPortMessagesViewModel Messages { get; set; }
 
         //public FaultIndicatorViewModel FaultIndicator { get; set; }
 
-        //public IndicatorDataViewModel IndicatorData { get; set; }
+        public BlockDataViewModel BlockData { get; set; }
 
         public SerialPortMessagesReceive Receiver { get; set; }
 
@@ -39,7 +38,7 @@ namespace FaultIndicator_MainIPConfig.ViewModels
             Receiver = new SerialPortMessagesReceive();
             Sender = new SerialPortMessagesSend();
             Messages = new SerialPortMessagesViewModel();
-            //IndicatorData = new IndicatorDataViewModel();
+            BlockData = new BlockDataViewModel();
             //FaultIndicator = new FaultIndicatorViewModel();
             /*Indicators = new ObservableCollection<FaultIndicatorViewModel>
             {
@@ -61,11 +60,11 @@ namespace FaultIndicator_MainIPConfig.ViewModels
 
             //Config = new ConfigViewModel(SerialPort, IndicatorData);
 
-            //IndicatorData.Messages = Messages;
-            //IndicatorData.Sender = Sender;
-            //IndicatorData.SerialPort = SerialPort;
-            //IndicatorData.Receiver = Receiver;
-            //Receiver.IndicatorData = IndicatorData;
+            BlockData.Messages = Messages;
+            BlockData.Sender = Sender;
+            BlockData.SerialPort = SerialPort;
+            BlockData.Receiver = Receiver;
+            Receiver.BaseBlock = BlockData;
             //IndicatorData.Indicators = Messages.Indicators;
             //IndicatorData.IndicatorConfirm = Receiver.IndicatorConfirm;
             //Config.SerialPort = SerialPort;

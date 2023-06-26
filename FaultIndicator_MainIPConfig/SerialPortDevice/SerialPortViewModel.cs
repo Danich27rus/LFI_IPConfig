@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using TheRFramework.Utilities;
 using FaultIndicator_MainIPConfig.SerialPMessages;
 using FaultIndicator_MainIPConfig.SerialPortDevice;
+using System.Threading;
 
 namespace FaultIndicator_MainIPConfig.SerialPortDevice
 {
@@ -14,6 +15,9 @@ namespace FaultIndicator_MainIPConfig.SerialPortDevice
     {
         // will be used to bind to the currently connected port
         private string _connectedPort;
+
+        private string[] _request;
+
         public string ConnectedPort
         {
             get => _connectedPort;
@@ -32,6 +36,12 @@ namespace FaultIndicator_MainIPConfig.SerialPortDevice
                 RaisePropertyChanged(ref _isConnected, value);
                 Settings.CanEditControls = !value;
             }
+        }
+
+        public string[] Request
+        {
+            get => _request;
+            set => RaisePropertyChanged(ref _request, value);
         }
 
         public void CloseAll()
@@ -88,6 +98,7 @@ namespace FaultIndicator_MainIPConfig.SerialPortDevice
             Port.Parity = Parity.None;
             Port.DataBits = 8;
             Port.Handshake = Handshake.None;
+            Sender.InitializationPackage = true;
             if (IsConnected)
             {
                 Messages.AddMessage("Порт уже открыт!");
@@ -122,6 +133,28 @@ namespace FaultIndicator_MainIPConfig.SerialPortDevice
             Messages.AddMessage($"Подключен к порту {ConnectedPort}!");
             IsConnected = true;
             Receiver.CanReceive = true;
+            /*if (Sender.InitializationPackage)
+            {
+                new Thread(() => {
+                    Request = new string[]
+                    {
+                    "68",
+                    "04",
+                    "07",
+                    "00",
+                    "00",
+                    "00"
+                    };
+
+                    Sender.SendHEXMessage(string.Join(" ", Request));
+                    Messages.AddSentMessage(string.Join(" ", Request));
+
+                    Thread.Sleep(500);
+
+                }).Start();
+
+                Sender.InitializationPackage = false;
+            }*/
         }
 
         public void Disconnect()

@@ -17,11 +17,13 @@ namespace FaultIndicator_MainIPConfig.SerialPMessages
         private HEXConverter hexConverter { get; set; }
         public SerialPort Port { get; set; }
         public bool CanSend { get; set; }
+        public bool InitializationPackage { get; set; }
         public SerialPortMessagesViewModel Messages { get; set; }
         public SerialPortMessagesSend()
         {
             hexConverter = new HEXConverter();
             CanSend = true;
+            InitializationPackage = false;
         }
 
         public void SendMessage(string message, bool shouldSendNewLine = false)
