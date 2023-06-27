@@ -7,6 +7,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Documents;
 using FaultIndicator_MainIPConfig.SerialPMessages;
 using FaultIndicator_MainIPConfig.SerialPortDevice;
 using Microsoft.VisualBasic;
@@ -16,15 +17,15 @@ namespace FaultIndicator_MainIPConfig.BaseBlock
 {
     public class BlockDataViewModel : BaseViewModel
     {
-        private string[] _request;
+        private List<string> _request;
 
         private string[] _patterns =
 {
-            "68 AC",        //SIM1
-            "68 A1",        //SIM2
+            "31 00 00 04",        //SIM1
+            "B1 00 00 04",        //SIM2
         };
 
-        public string[] Request
+        public List<string> Request
         {
             get => _request;
             set => RaisePropertyChanged(ref _request, value);
@@ -65,25 +66,25 @@ namespace FaultIndicator_MainIPConfig.BaseBlock
 
         public void ParseCommand()
         {
-            string[] msg;
+            List<string> msg;
             int sub = 0;
             if (string.IsNullOrEmpty(BlockResponse))
             {
                 return;// "В ответ ничего не пришло";
             }
 
-            msg = BlockResponse.Split(' ');
+            msg = BlockResponse.Split(' ').ToList();
 
 
             if (BlockResponse.Contains(_patterns[0]))
             {
-                if (msg.Length < 145)
+                if (msg.Count < 145)
                 {
                     Messages.AddMessage("Ответ не полный");
                     return;
                 }
                 Messages.AddMessage("SIM1 ответ");
-                Information.Add(new SIMDataModel { RemotePort = (Convert.ToInt16(msg[93], 16) + (Convert.ToInt16(msg[94], 16) << 8))});
+                Information.Add(new SIMDataModel { RemotePort = (Convert.ToInt16(msg[93], 16) + (Convert.ToInt16(msg[94], 16) << 8)) });
                 Information[0].RemoteIPAdress = "";
                 for (int i = 39; i < 70; ++i)
                 {
@@ -128,13 +129,13 @@ namespace FaultIndicator_MainIPConfig.BaseBlock
             }
             if (BlockResponse.Contains(_patterns[1]))
             {
-                if (msg.Length < 145)
+                if (msg.Count < 145)
                 {
                     Messages.AddMessage("Ответ не полный");
                     return;
                 }
                 Messages.AddMessage("SIM2 ответ");
-                Information.Add(new SIMDataModel { RemotePort = (Convert.ToInt16(msg[93], 16) + (Convert.ToInt16(msg[94], 16) << 8))});
+                Information.Add(new SIMDataModel { RemotePort = (Convert.ToInt16(msg[93], 16) + (Convert.ToInt16(msg[94], 16) << 8)) });
                 Information[1].RemoteIPAdress = "";
                 for (int i = 39; i < 52; ++i)
                 {
@@ -211,7 +212,7 @@ namespace FaultIndicator_MainIPConfig.BaseBlock
             {
                 if (Sender.InitializationPackage)
                 {
-                    Request = new string[]
+                    Request = new List<string>
                         {
                     "68",
                     "04",
@@ -227,7 +228,7 @@ namespace FaultIndicator_MainIPConfig.BaseBlock
 
                     Thread.Sleep(500);
                 }
-                Request = new string[]
+                Request = new List<string>
                 {
                     "68",
                     "11",
@@ -264,11 +265,17 @@ namespace FaultIndicator_MainIPConfig.BaseBlock
                 Messages.AddMessage("Порт не открыт, не удалось отправить сообщение");
                 return;
             }
+
+            string[] saveString = new string [Information[0].APN.Length];
+
+            int insertionIndex = -1;
+            int lengthIndex = -1;
+
             new Thread(() =>
             {
                 if (Sender.InitializationPackage)
                 {
-                    Request = new string[]
+                    Request = new List<string>
                         {
                     "68",
                     "04",
@@ -284,13 +291,13 @@ namespace FaultIndicator_MainIPConfig.BaseBlock
 
                     Thread.Sleep(500);
                 }
-                Request = new string[]
+                Request = new List<string>
                 {
                     "68",
                     "CB",
-                    "C2", 
+                    "C2",
                     "00",
-                    "C6", 
+                    "C6",
                     "00",
                     "7D",
                     "01",
@@ -344,7 +351,7 @@ namespace FaultIndicator_MainIPConfig.BaseBlock
                     "00",
                     "00",
                     "00",
-                    "00", 
+                    "00",
                     "00",
                     "00",
                     "00",
@@ -496,7 +503,7 @@ namespace FaultIndicator_MainIPConfig.BaseBlock
                 int k = 39;         // старт с ip
                 int b = 0;
 
-                for (int i = 0; i < Information[0].RemoteIPAdress.Length; ++i) 
+                for (int i = 0; i < Information[0].RemoteIPAdress.Length; ++i)
                 {
                     Request[k] = $"{Convert.ToByte(Information[0].RemoteIPAdress[i]):X2}";
                     ++k;
@@ -514,7 +521,233 @@ namespace FaultIndicator_MainIPConfig.BaseBlock
                 Sender.SendHEXMessage(string.Join(" ", Request));
                 Messages.AddSentMessage(string.Join(" ", Request));
 
-                Thread.Sleep(500);
+                Thread.Sleep(4000);
+
+                Request = new List<string>
+                {
+                "68",
+                "8C",
+                "EC",
+                "00",
+                "6E",
+                "00",
+                "7D",
+                "01",
+                "0D",
+                "00",
+                "00",
+                "00",
+                "00",
+                "00",
+                "00",
+                "01",
+                "00",
+                "05",
+                "7B",
+                "02",
+                "10",
+                "00",
+                "00", //длина нулёвка по дефолту
+                //"0E",  -- длина
+                //"70",  -- начало APN
+                //"75",
+                //"62",
+                //"6C",
+                //"69",
+                //"63",
+                //"2E",
+                //"70",
+                //"72",
+                //"6F",
+                //"66",
+                //"69",
+                //"6C",
+                //"65",  -- конец APN
+                "03",
+                "10",
+                "00",
+                "00", //длина нулёвка по дефолту
+                //"04", -- длина
+                //"63", -- начало username
+                //"61",
+                //"72",
+                //"64", -- конец username
+                "04",
+                "10",
+                "00",
+                "00", //длина нулёвка по дефолту
+                //"04", -- длина
+                //"63", -- начало passsword
+                //"61",
+                //"72",
+                //"64", -- конец password
+                "08",
+                "10",
+                "00",
+                "01",
+                "00",
+                "AD",
+                "00",
+                "00",
+                "01",
+                "01",
+                "AE",
+                "00",
+                "00",
+                "01",
+                "01",
+                "AF",
+                "00",
+                "00",
+                "01",
+                "00",
+                "B0",
+                "00",
+                "00",
+                "01",
+                "00",
+                "B1",
+                "00",
+                "00",
+                "04",
+                "00",
+                "00",
+                "00",
+                "00",
+                "B2",
+                "00",
+                "00",
+                "01",
+                "00",
+                "81",
+                "10",
+                "00",
+                "08",
+                "2A",
+                "39",
+                "39",
+                "2A",
+                "2A",
+                "2A",
+                "31",
+                "23",
+                "82",
+                "10",
+                "00",
+                "05",
+                "63",
+                "6D",
+                "6E",
+                "65",
+                "74",
+                "83",
+                "10",
+                "00",
+                "04",
+                "63",
+                "61",
+                "72",
+                "64",
+                "84",
+                "10",
+                "00",
+                "04",
+                "63",
+                "61",
+                "72",
+                "64",
+                "88",
+                "10",
+                "00",
+                "01",
+                "00",
+                "A1",
+                "FF",
+                "00",
+                "01",
+                "00",
+                "A2",
+                "FF",
+                "00",
+                "00"
+                };
+
+                for (int i = 0; i < Request.Count - 1; ++i)
+                {
+                    if (Request[i] == "02" && Request[i + 1] == "10")
+                    {
+                        insertionIndex = i + 4; // Вставка после длины
+                        lengthIndex = i + 3;
+                        break;
+                    }
+                }
+
+                if (insertionIndex != -1)
+                {
+                    for (int i = 0; i < Information[0].APN.Length; ++i)
+                    {
+                        saveString[i] = $"{Convert.ToInt16(Information[0].APN[i]):X2}";
+                    }
+                    Request[lengthIndex] = $"{Convert.ToInt16(saveString.Length):X2}";
+                    Request.InsertRange(insertionIndex, saveString);
+                }
+
+                insertionIndex = -1;
+                lengthIndex = -1;
+                saveString = new string[Information[0].Username.Length];
+
+                for (int i = 0; i < Request.Count - 1; ++i)
+                {
+                    if (Request[i] == "03" && Request[i + 1] == "10")
+                    {
+                        insertionIndex = i + 4; // Вставка после длины
+                        lengthIndex = i + 3;
+                        break;
+                    }
+                }
+
+                if (insertionIndex != -1)
+                {
+                    for (int i = 0; i < Information[0].Username.Length; ++i)
+                    {
+                        saveString[i] = $"{Convert.ToInt16(Information[0].Username[i]):X2}";
+                    }
+                    Request[lengthIndex] = $"{Convert.ToInt16(saveString.Length):X2}";
+                    Request.InsertRange(insertionIndex, saveString);
+                }
+
+                insertionIndex = -1;
+                lengthIndex = -1;
+                saveString = new string[Information[0].Password.Length];
+
+                for (int i = 0; i < Request.Count - 1; ++i)
+                {
+                    if (Request[i] == "04" && Request[i + 1] == "10")
+                    {
+                        insertionIndex = i + 4; // Вставка после длины
+                        lengthIndex = i + 3;
+                        break;
+                    }
+                }
+
+                if (insertionIndex != -1)
+                {
+                    for (int i = 0; i < Information[0].Password.Length; ++i)
+                    {
+                        saveString[i] = $"{Convert.ToInt16(Information[0].Password[i]):X2}";
+                    }
+                    Request[lengthIndex] = $"{Convert.ToInt16(saveString.Length):X2}";
+                    Request.InsertRange(insertionIndex, saveString);
+                }
+
+                Request[1] = $"{(Request.Count - 2):X2}";
+                Request[18] = $"{(Request.Count - 19):X2}";
+
+
+                Sender.SendHEXMessage(string.Join(" ", Request));
+                Messages.AddSentMessage(string.Join(" ", Request));
+                Thread.Sleep(1000);
+
             }).Start();
         }
     }

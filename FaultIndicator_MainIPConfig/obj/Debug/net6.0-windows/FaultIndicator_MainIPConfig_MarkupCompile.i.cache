@@ -4,17 +4,17 @@
 winexe
 C#
 .cs
-C:\git\FaultIndicator_MainIPConfig\FaultIndicator_MainIPConfig\obj\Debug\net6.0-windows\
+C:\repos_git\LFI_IPConfig\FaultIndicator_MainIPConfig\obj\Debug\net6.0-windows\
 FaultIndicator_MainIPConfig
 none
 false
 TRACE;DEBUG;NET;NET6_0;NETCOREAPP
-C:\git\FaultIndicator_MainIPConfig\FaultIndicator_MainIPConfig\App.xaml
+C:\repos_git\LFI_IPConfig\FaultIndicator_MainIPConfig\App.xaml
 2463866462
 
 27-2133384717
-196-1358997877
+196-1465151451
 MainWindow.xaml;Themes\DarkTheme.xaml;
 
-False
+True
 
