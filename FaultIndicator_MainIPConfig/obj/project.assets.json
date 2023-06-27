@@ -268,23 +268,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\grigh\\.nuget\\packages\\": {},
+    "C:\\Users\\grigorev\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\repos_git\\LFI_IPConfig\\FaultIndicator_MainIPConfig\\FaultIndicator_MainIPConfig.csproj",
+      "projectUniqueName": "C:\\git\\FaultIndicator_MainIPConfig\\FaultIndicator_MainIPConfig\\FaultIndicator_MainIPConfig.csproj",
       "projectName": "FaultIndicator_MainIPConfig",
-      "projectPath": "C:\\repos_git\\LFI_IPConfig\\FaultIndicator_MainIPConfig\\FaultIndicator_MainIPConfig.csproj",
-      "packagesPath": "C:\\Users\\grigh\\.nuget\\packages\\",
-      "outputPath": "C:\\repos_git\\LFI_IPConfig\\FaultIndicator_MainIPConfig\\obj\\",
+      "projectPath": "C:\\git\\FaultIndicator_MainIPConfig\\FaultIndicator_MainIPConfig\\FaultIndicator_MainIPConfig.csproj",
+      "packagesPath": "C:\\Users\\grigorev\\.nuget\\packages\\",
+      "outputPath": "C:\\git\\FaultIndicator_MainIPConfig\\FaultIndicator_MainIPConfig\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\grigh\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\grigorev\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -340,7 +340,7 @@
             "privateAssets": "none"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.102\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.304\\RuntimeIdentifierGraph.json"
       }
     }
   }

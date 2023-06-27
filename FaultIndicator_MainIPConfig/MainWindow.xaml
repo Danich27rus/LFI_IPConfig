@@ -54,6 +54,7 @@
                 <RowDefinition Height="35*"/>
                 <RowDefinition Height="35*"/>
                 <RowDefinition Height="35*"/>
+                <RowDefinition Height="35*"/>
                 <RowDefinition Height="25*"/>
             </Grid.RowDefinitions>
             <TextBlock Text="COM-порт:" VerticalAlignment="Center" Margin="10,0,0,0" Grid.Row="0"/>
@@ -72,14 +73,21 @@
                     Command="{Binding SerialPort.AutoConnectDisconnectCommand, Mode=OneTime}"
                     Content="{Binding SerialPort.IsConnected, Converter={StaticResource BoolToIsConnectedConverter}, UpdateSourceTrigger=PropertyChanged}" 
                     Margin="0" Grid.Row="2"/>
-            <Button x:Name="COMRResetButton" Content="Обновить порты" IsEnabled="{Binding SerialPort.Settings.CanEditControls}"
+            <Button x:Name="COMRResetButton" Content="Обновить список портов" IsEnabled="{Binding SerialPort.Settings.CanEditControls}"
                     Command="{Binding SerialPort.Settings.RefreshPortsCommand, Mode=OneTime}"
                     Cursor="Hand" Margin="0" Grid.Row="3"/>
-            <Button Content="Чтение данных" Command="{Binding BlockData.ReadParamsCommand}" Margin="0" Grid.Row="4"/>
-            <Button Content="Запись данных" Command="{Binding BlockData.WriteParamsCommand}" Margin="0" Grid.Row="5"/>
+            <Button Command="{Binding BlockData.ReadParamsCommand}" Margin="0" Grid.Row="4">
+                <TextBlock Text="Чтение данных с базового блока" TextWrapping="Wrap" TextAlignment="Center"/>
+            </Button>
+            <Button Command="{Binding BlockData.WriteParamsCommand}" Margin="0" Grid.Row="5">
+                <TextBlock Text="Запись данных на базовый блок" TextWrapping="Wrap" TextAlignment="Center"/>
+            </Button>
+            <Button Command="{Binding}" Margin="0" Grid.Row="6">
+                <TextBlock Text="Выход из отладочного режима базового блока" TextWrapping="Wrap" TextAlignment="Center"/>
+            </Button>
             <Button x:Name="ConsoleBoxClearButton" 
                     Command="{Binding Messages.ClearMessagesCommand}"
-                    Content="Очистить лог" Margin="0" Grid.Row="6"/>
+                    Content="Очистить лог" Margin="0" Grid.Row="7"/>
         </Grid>
         <Grid Grid.Column="1">
             <Grid.RowDefinitions>
@@ -139,13 +147,13 @@
                             <TextBlock x:Name="SecondSIMUsername" HorizontalAlignment="Left" TextWrapping="Wrap" Margin="5,0,0,0" Text="Имя пользователя" VerticalAlignment="Center" Grid.Row="5"/>
                             <TextBlock x:Name="SecondSIMPassword" HorizontalAlignment="Left" TextWrapping="Wrap" Margin="5,0,0,0" Text="Пароль" VerticalAlignment="Center" Grid.Row="6"/>
                             <!--хард-код коллекции-->
-                            <TextBox x:Name="SecondRemoteIPAddresstextBox" BorderBrush="#FF2A2A2A" HorizontalAlignment="Right" TextWrapping="Wrap" Text="{Binding IndicatorData.CallAdress, TargetNullValue='', StringFormat=d, UpdateSourceTrigger=PropertyChanged}" UI:Masking.Mask="^[0-9]+$" VerticalAlignment="Center" Width="140" Grid.Row="0" Margin="0,0,10,0"/>
-                            <TextBox x:Name="SecondRemotePorttextBox" BorderBrush="#FF2A2A2A" HorizontalAlignment="Right" TextWrapping="Wrap" Text="{Binding IndicatorData.CallFrequency, TargetNullValue='', StringFormat=d, UpdateSourceTrigger=PropertyChanged}" UI:Masking.Mask="^[0-9]+$" VerticalAlignment="Center" Width="80" Grid.Row="1" Margin="0,0,10,0"/>
-                            <TextBox x:Name="SecondSIMCSQtextBox" BorderBrush="#FF2A2A2A" HorizontalAlignment="Right" TextWrapping="Wrap" Text="{Binding IndicatorData.CallTime, TargetNullValue='', StringFormat=d, UpdateSourceTrigger=PropertyChanged}" UI:Masking.Mask="^[0-9]+$" VerticalAlignment="Center" Width="80" Grid.Row="2" Margin="0,0,10,0"/>
-                            <TextBox x:Name="SecondSIMAPNtextBox" BorderBrush="#FF2A2A2A" HorizontalAlignment="Right" TextWrapping="Wrap" Text="{Binding IndicatorData.WaitTime, TargetNullValue='', StringFormat=d, UpdateSourceTrigger=PropertyChanged}" UI:Masking.Mask="^[0-9]+$" VerticalAlignment="Center" Width="80" Grid.Row="3" Margin="0,0,10,0"/>
-                            <TextBox x:Name="SecondSIMIPAddresstextBox" BorderBrush="#FF2A2A2A" HorizontalAlignment="Right" TextWrapping="Wrap" Text="{Binding IndicatorData.CallFrequency, TargetNullValue='', StringFormat=d, UpdateSourceTrigger=PropertyChanged}" UI:Masking.Mask="^[0-9]+$" VerticalAlignment="Center" Width="80" Grid.Row="4" Margin="0,0,10,0"/>
-                            <TextBox x:Name="SecondSIMUsernametextBox" BorderBrush="#FF2A2A2A" HorizontalAlignment="Right" TextWrapping="Wrap" Text="{Binding IndicatorData.CallTime, TargetNullValue='', StringFormat=d, UpdateSourceTrigger=PropertyChanged}" UI:Masking.Mask="^[0-9]+$" VerticalAlignment="Center" Width="80" Grid.Row="5" Margin="0,0,10,0"/>
-                            <TextBox x:Name="SecondSIMPasswordtextBox" BorderBrush="#FF2A2A2A" HorizontalAlignment="Right" TextWrapping="Wrap" Text="{Binding IndicatorData.WaitTime, TargetNullValue='', StringFormat=d, UpdateSourceTrigger=PropertyChanged}" UI:Masking.Mask="^[0-9]+$" VerticalAlignment="Center" Width="80" Grid.Row="6" Margin="0,0,10,0"/>
+                            <TextBox x:Name="SecondRemoteIPAddresstextBox" BorderBrush="#FF2A2A2A" HorizontalAlignment="Right" TextWrapping="Wrap" Text="{Binding BlockData.Information[1].RemoteIPAdress, TargetNullValue='', StringFormat=d, UpdateSourceTrigger=PropertyChanged}" UI:Masking.Mask="^[0-9]+$" VerticalAlignment="Center" Width="140" Grid.Row="0" Margin="0,0,10,0"/>
+                            <TextBox x:Name="SecondRemotePorttextBox" BorderBrush="#FF2A2A2A" HorizontalAlignment="Right" TextWrapping="Wrap" Text="{Binding BlockData.Information[1].RemotePort, TargetNullValue='', StringFormat=d, UpdateSourceTrigger=PropertyChanged}" UI:Masking.Mask="^[0-9]+$" VerticalAlignment="Center" Width="80" Grid.Row="1" Margin="0,0,10,0"/>
+                            <TextBox x:Name="SecondSIMCSQtextBox" BorderBrush="#FF2A2A2A" HorizontalAlignment="Right" TextWrapping="Wrap" Text="{Binding BlockData.Information[1].CSQ, TargetNullValue='', StringFormat=d, UpdateSourceTrigger=PropertyChanged}" UI:Masking.Mask="^[0-9]+$" VerticalAlignment="Center" Width="80" Grid.Row="2" Margin="0,0,10,0"/>
+                            <TextBox x:Name="SecondSIMAPNtextBox" BorderBrush="#FF2A2A2A" HorizontalAlignment="Right" TextWrapping="Wrap" Text="{Binding BlockData.Information[1].APN, TargetNullValue='', StringFormat=d, UpdateSourceTrigger=PropertyChanged}" UI:Masking.Mask="^[0-9]+$" VerticalAlignment="Center" Width="80" Grid.Row="3" Margin="0,0,10,0"/>
+                            <TextBox x:Name="SecondSIMIPAddresstextBox" BorderBrush="#FF2A2A2A" HorizontalAlignment="Right" TextWrapping="Wrap" Text="{Binding BlockData.Information[1].AcquireIPAddress, TargetNullValue='', StringFormat=d, UpdateSourceTrigger=PropertyChanged}" UI:Masking.Mask="^[0-9]+$" VerticalAlignment="Center" Width="80" Grid.Row="4" Margin="0,0,10,0"/>
+                            <TextBox x:Name="SecondSIMUsernametextBox" BorderBrush="#FF2A2A2A" HorizontalAlignment="Right" TextWrapping="Wrap" Text="{Binding BlockData.Information[1].Username, TargetNullValue='', StringFormat=d, UpdateSourceTrigger=PropertyChanged}" UI:Masking.Mask="^[0-9]+$" VerticalAlignment="Center" Width="80" Grid.Row="5" Margin="0,0,10,0"/>
+                            <TextBox x:Name="SecondSIMPasswordtextBox" BorderBrush="#FF2A2A2A" HorizontalAlignment="Right" TextWrapping="Wrap" Text="{Binding BlockData.Information[1].Password, TargetNullValue='', StringFormat=d, UpdateSourceTrigger=PropertyChanged}" UI:Masking.Mask="^[0-9]+$" VerticalAlignment="Center" Width="80" Grid.Row="6" Margin="0,0,10,0"/>
                         </Grid>
                     </GroupBox>
                 </Grid>

@@ -8,4 +8,4 @@ build_property.PlatformNeutralAssembly =
 build_property.EnforceExtendedAnalyzerRules = 
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = FaultIndicator_MainIPConfig
-build_property.ProjectDir = C:\repos_git\LFI_IPConfig\FaultIndicator_MainIPConfig\
+build_property.ProjectDir = C:\git\FaultIndicator_MainIPConfig\FaultIndicator_MainIPConfig\

@@ -108,7 +108,7 @@ namespace FaultIndicator_MainIPConfig.SerialPMessages
                         }
                     }
                 }
-                Thread.Sleep(25);
+                Thread.Sleep(100);
             }
             //Dispatcher.Thread.Interrupt();
         }
