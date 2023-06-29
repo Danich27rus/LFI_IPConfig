@@ -13,7 +13,7 @@ namespace FaultIndicator_MainIPConfig.BaseBlock
         private int _remotePort;
         private string _APN;
         private int _CSQ;
-        private string _acquireIPAddress;
+        private string _acquiredIPAddress;
         private string _username;
         private string _password;
 
@@ -41,10 +41,10 @@ namespace FaultIndicator_MainIPConfig.BaseBlock
             set => RaisePropertyChanged(ref _CSQ, value);
         }
 
-        public string AcquireIPAddress
+        public string AcquiredIPAddress
         {
-            get => _acquireIPAddress; 
-            set => RaisePropertyChanged(ref _acquireIPAddress, value);
+            get => _acquiredIPAddress; 
+            set => RaisePropertyChanged(ref _acquiredIPAddress, value);
         }
 
         public string Username

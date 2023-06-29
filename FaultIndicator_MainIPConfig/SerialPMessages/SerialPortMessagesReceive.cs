@@ -73,8 +73,8 @@ namespace FaultIndicator_MainIPConfig.SerialPMessages
                     {
                         while(Port.BytesToRead > 0)
                         {
-                            if (Messages.IsHEX)
-                            {
+                            //if (Messages.IsHEX)
+                            //{
                                 readByte = Port.ReadByte();
                                 message += readByte.ToString("X2") + " ";
                                 if (Port.BytesToRead == 0 && Messages.IsHEX)
@@ -85,7 +85,7 @@ namespace FaultIndicator_MainIPConfig.SerialPMessages
                                     Messages.AddReceivedMessage(message);
                                     message = "";
                                 }
-                            }
+                            /*}
                             else
                             {
                                 readChar = (char)Port.ReadChar();
@@ -101,14 +101,14 @@ namespace FaultIndicator_MainIPConfig.SerialPMessages
                                         message += readChar;
                                         break;
                                 }
-                            }
+                            }*/
                             //read2 = Port.ReadByte();
                             //read3 = Port.ReadByte();
                             //TODO: Нет обработки без '/n'
                         }
                     }
                 }
-                Thread.Sleep(100);
+                Thread.Sleep(80);
             }
             //Dispatcher.Thread.Interrupt();
         }
