@@ -106,6 +106,7 @@ namespace FaultIndicator_MainIPConfig.SerialPMessages
                             //read3 = Port.ReadByte();
                             //TODO: Нет обработки без '/n'
                         }
+                        //Port.DiscardInBuffer();
                     }
                 }
                 Thread.Sleep(80);

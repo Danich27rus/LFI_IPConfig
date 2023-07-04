@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Documents;
+using System.Windows.Interop;
 using FaultIndicator_MainIPConfig.SerialPMessages;
 using FaultIndicator_MainIPConfig.SerialPortDevice;
 using Microsoft.VisualBasic;
@@ -46,6 +47,8 @@ namespace FaultIndicator_MainIPConfig.BaseBlock
 
         public Command WriteParamsCommand { get; set; }
 
+        public Command ExitDebugCommand { get; set; }
+
         public string BlockResponse { get; set; }
 
         public BlockDataViewModel()
@@ -64,10 +67,13 @@ namespace FaultIndicator_MainIPConfig.BaseBlock
             };
             ReadParamsCommand = new Command(ReadParams);
             WriteParamsCommand = new Command(WriteParams);
+            ExitDebugCommand = new Command(ExitDebug);
         }
 
         public void ParseCommand()
         {
+            //System.ArgumentOutOfRangeException
+
             List<string> msg;
             int sub = 0, checkIndex = -1, size = -1;
 
@@ -79,380 +85,397 @@ namespace FaultIndicator_MainIPConfig.BaseBlock
             msg = BlockResponse.Split(' ').ToList();
 
             #region Парсинг по сообщению от SIM1
-            if (BlockResponse.Contains(_patterns[0]))
+
+            try
             {
-                if (msg.Count < 145)
+                if (BlockResponse.Contains(_patterns[0]))
                 {
-                    Messages.AddMessage("Ответ не полный");
+                    if (msg.Count < 145)
+                    {
+                        Messages.AddMessage("Ответ не полный");
+                        return;
+                    }
+                    Messages.AddMessage("SIM1 ответ");
+                    if (!_sim1Added)
+                    {
+                        for (int i = 0; i < msg.Count - 1; ++i)
+                        {
+                            if (msg[i] == "2C" && msg[i + 1] == "00" && msg[i + 2] == "00")
+                            {
+                                checkIndex = i + 4;
+                                break;
+                            }
+                        }
+                        Information.Add(new SIMDataModel
+                        {
+                            RemotePort = (Convert.ToInt16(msg[checkIndex], 16) + (Convert.ToInt16(msg[checkIndex + 1], 16) << 8))
+                        });
+                        _sim1Added = true;
+                    }
+                    else
+                    {
+                        for (int i = 0; i < msg.Count - 1; ++i)
+                        {
+                            if (msg[i] == "2C" && msg[i + 1] == "00" && msg[i + 2] == "00")
+                            {
+                                checkIndex = i + 4;
+                                break;
+                            }
+                        }
+                        Information[0].RemotePort = (Convert.ToInt16(msg[checkIndex], 16) + (Convert.ToInt16(msg[checkIndex + 1], 16) << 8));
+                    }
+
+                    checkIndex = -1;
+
+                    //Поиск в массиве удалённого IP
+                    Information[0].RemoteIPAdress = "";
+                    for (int i = 0; i < msg.Count - 1; ++i)
+                    {
+                        if (msg[i] == "2B" && msg[i + 1] == "00" && msg[i + 2] == "00")
+                        {
+                            checkIndex = i + 4;
+                            size = Convert.ToInt16(msg[i + 3], 16);
+                            break;
+                        }
+                    }
+
+                    if (checkIndex != -1)
+                    {
+                        for (int i = checkIndex; i < (size + checkIndex); ++i)
+                        {
+                            if (msg[i] == "00")
+                            {
+                                break;
+                            }
+                            Information[0].RemoteIPAdress += Convert.ToChar(Convert.ToByte(msg[i], 16));
+                        }
+                    }
+
+                    size = -1;
+                    checkIndex = -1;
+
+                    //Поиск в массиве CSQ
+                    Information[0].CSQ = 0;
+                    for (int i = 0; i < msg.Count - 1; ++i)
+                    {
+                        if (msg[i] == "2F" && msg[i + 1] == "00" && msg[i + 2] == "00")
+                        {
+                            checkIndex = i + 4;
+                            //size = Convert.ToInt16(msg[i + 3], 16);
+                            break;
+                        }
+                    }
+                    if (checkIndex != -1)
+                    {
+                        Information[0].CSQ = Convert.ToInt16(msg[checkIndex], 16);
+                    }
+
+                    checkIndex = -1;
+
+                    //Поиск в массиве APN
+                    Information[0].APN = "";
+                    for (int i = 0; i < msg.Count - 1; ++i)
+                    {
+                        if (msg[i] == "02" && msg[i + 1] == "10" && msg[i + 2] == "00")
+                        {
+                            checkIndex = i + 4;
+                            size = Convert.ToInt16(msg[i + 3], 16);
+                            break;
+                        }
+                    }
+                    if (checkIndex != -1)
+                    {
+                        for (int i = checkIndex; i < (size + checkIndex); ++i)
+                        {
+                            if (msg[i] == "00")
+                            {
+                                break;
+                            }
+                            Information[0].APN += Convert.ToChar(Convert.ToByte(msg[i], 16));
+                        }
+                    }
+
+                    size = -1;
+                    checkIndex = -1;
+
+                    //Поиск в массиве IP от SIM
+                    Information[0].AcquiredIPAddress = "";
+                    for (int i = 0; i < msg.Count - 1; ++i)
+                    {
+                        if (msg[i] == "31" && msg[i + 1] == "00" && msg[i + 2] == "00")
+                        {
+                            checkIndex = i + 4;
+                            size = Convert.ToInt16(msg[i + 3], 16);
+                            break;
+                        }
+                    }
+                    if (checkIndex != -1)
+                    {
+                        for (int i = checkIndex; i < (size + checkIndex); ++i)
+                        {
+                            Information[0].AcquiredIPAddress += Convert.ToByte(msg[i], 16).ToString();
+                            if (i < (size + checkIndex) - 1)
+                            {
+                                Information[0].AcquiredIPAddress += '.';
+                            }
+                        }
+                    }
+
+                    size = -1;
+                    checkIndex = -1;
+
+                    //Поиск в массиве Username
+                    Information[0].Username = "";
+                    for (int i = 0; i < msg.Count - 1; ++i)
+                    {
+                        if (msg[i] == "03" && msg[i + 1] == "10" && msg[i + 2] == "00")
+                        {
+                            checkIndex = i + 4;
+                            size = Convert.ToInt16(msg[i + 3], 16);
+                            break;
+                        }
+                    }
+                    if (checkIndex != -1)
+                    {
+                        for (int i = checkIndex; i < (size + checkIndex); ++i)
+                        {
+                            if (msg[i] == "00")
+                            {
+                                break;
+                            }
+                            Information[0].Username += Convert.ToChar(Convert.ToByte(msg[i], 16));
+                        }
+                    }
+
+                    size = -1;
+                    checkIndex = -1;
+
+                    //Поиск в массиве Password
+                    Information[0].Password = "";
+                    for (int i = 0; i < msg.Count - 1; ++i)
+                    {
+                        if (msg[i] == "04" && msg[i + 1] == "10" && msg[i + 2] == "00")
+                        {
+                            checkIndex = i + 4;
+                            size = Convert.ToInt16(msg[i + 3], 16);
+                            break;
+                        }
+                    }
+                    if (checkIndex != -1)
+                    {
+                        for (int i = checkIndex; i < (size + checkIndex); ++i)
+                        {
+                            if (msg[i] == "00")
+                            {
+                                break;
+                            }
+                            Information[0].Password += Convert.ToChar(Convert.ToByte(msg[i], 16));
+                        }
+                    }
                     return;
                 }
-                Messages.AddMessage("SIM1 ответ");
-                if (!_sim1Added)
-                {
-                    for (int i = 0; i < msg.Count - 1; ++i)
-                    {
-                        if (msg[i] == "2C" && msg[i + 1] == "00" && msg[i + 2] == "00")
-                        {
-                            checkIndex = i + 4;
-                            break;
-                        }
-                    }
-                    Information.Add(new SIMDataModel
-                    {
-                        RemotePort = (Convert.ToInt16(msg[checkIndex], 16) + (Convert.ToInt16(msg[checkIndex + 1], 16) << 8))
-                    });
-                    _sim1Added = true;
-                }
-                else
-                {
-                    for (int i = 0; i < msg.Count - 1; ++i)
-                    {
-                        if (msg[i] == "2C" && msg[i + 1] == "00" && msg[i + 2] == "00")
-                        {
-                            checkIndex = i + 4;
-                            break;
-                        }
-                    }
-                    Information[0].RemotePort = (Convert.ToInt16(msg[checkIndex], 16) + (Convert.ToInt16(msg[checkIndex + 1], 16) << 8));
-                }
-
-                checkIndex = -1;
-
-                //Поиск в массиве удалённого IP
-                Information[0].RemoteIPAdress = "";
-                for (int i = 0; i < msg.Count - 1; ++i)
-                {
-                    if (msg[i] == "2B" && msg[i + 1] == "00" && msg[i + 2] == "00")
-                    {
-                        checkIndex = i + 4;
-                        size = Convert.ToInt16(msg[i + 3], 16);
-                        break;
-                    }
-                }
-
-                if (checkIndex != -1)
-                {
-                    for (int i = checkIndex; i < (size + checkIndex); ++i)
-                    {
-                        if (msg[i] == "00")
-                        {
-                            break;
-                        }
-                        Information[0].RemoteIPAdress += Convert.ToChar(Convert.ToByte(msg[i], 16));
-                    }
-                }
-
-                size = -1;
-                checkIndex = -1;
-
-                //Поиск в массиве CSQ
-                Information[0].CSQ = 0;
-                for (int i = 0; i < msg.Count - 1; ++i)
-                {
-                    if (msg[i] == "2F" && msg[i + 1] == "00" && msg[i + 2] == "00")
-                    {
-                        checkIndex = i + 4;
-                        //size = Convert.ToInt16(msg[i + 3], 16);
-                        break;
-                    }
-                }
-                if (checkIndex != -1)
-                {
-                    Information[0].CSQ = Convert.ToInt16(msg[checkIndex], 16);
-                }
-
-                checkIndex = -1;
-
-                //Поиск в массиве APN
-                Information[0].APN = "";
-                for (int i = 0; i < msg.Count - 1; ++i)
-                {
-                    if (msg[i] == "02" && msg[i + 1] == "10" && msg[i + 2] == "00")
-                    {
-                        checkIndex = i + 4;
-                        size = Convert.ToInt16(msg[i + 3], 16);
-                        break;
-                    }
-                }
-                if (checkIndex != -1)
-                {
-                    for (int i = checkIndex; i < (size + checkIndex); ++i)
-                    {
-                        if (msg[i] == "00")
-                        {
-                            break;
-                        }
-                        Information[0].APN += Convert.ToChar(Convert.ToByte(msg[i], 16));
-                    }
-                }
-
-                size = -1;
-                checkIndex = -1;
-
-                //Поиск в массиве IP от SIM
-                Information[0].AcquiredIPAddress = "";
-                for (int i = 0; i < msg.Count - 1; ++i)
-                {
-                    if (msg[i] == "31" && msg[i + 1] == "00" && msg[i + 2] == "00")
-                    {
-                        checkIndex = i + 4;
-                        size = Convert.ToInt16(msg[i + 3], 16);
-                        break;
-                    }
-                }
-                if (checkIndex != -1)
-                {
-                    for (int i = checkIndex; i < (size + checkIndex); ++i)
-                    {
-                        Information[0].AcquiredIPAddress += Convert.ToByte(msg[i], 16).ToString();
-                        if (i < (size + checkIndex) - 1)
-                        {
-                            Information[0].AcquiredIPAddress += '.';
-                        }
-                    }
-                }
-
-                size = -1;
-                checkIndex = -1;
-
-                //Поиск в массиве Username
-                Information[0].Username = "";
-                for (int i = 0; i < msg.Count - 1; ++i)
-                {
-                    if (msg[i] == "03" && msg[i + 1] == "10" && msg[i + 2] == "00")
-                    {
-                        checkIndex = i + 4;
-                        size = Convert.ToInt16(msg[i + 3], 16);
-                        break;
-                    }
-                }
-                if (checkIndex != -1)
-                {
-                    for (int i = checkIndex; i < (size + checkIndex); ++i)
-                    {
-                        if (msg[i] == "00")
-                        {
-                            break;
-                        }
-                        Information[0].Username += Convert.ToChar(Convert.ToByte(msg[i], 16));
-                    }
-                }
-
-                size = -1;
-                checkIndex = -1;
-
-                //Поиск в массиве Password
-                Information[0].Password = "";
-                for (int i = 0; i < msg.Count - 1; ++i)
-                {
-                    if (msg[i] == "04" && msg[i + 1] == "10" && msg[i + 2] == "00")
-                    {
-                        checkIndex = i + 4;
-                        size = Convert.ToInt16(msg[i + 3], 16);
-                        break;
-                    }
-                }
-                if (checkIndex != -1)
-                {
-                    for (int i = checkIndex; i < (size + checkIndex); ++i)
-                    {
-                        if (msg[i] == "00")
-                        {
-                            break;
-                        }
-                        Information[0].Password += Convert.ToChar(Convert.ToByte(msg[i], 16));
-                    }
-                }
-                return;
             }
+            catch (System.ArgumentOutOfRangeException)
+            {
+                Messages.AddMessage("Считывание данных произошло неккоректно, повторите попытку");
+            }
+
             #endregion
 
             #region Парсинг по сообщению от SIM2
-            if (BlockResponse.Contains(_patterns[1]))
+
+            try
             {
-                if (msg.Count < 145)
+                if (BlockResponse.Contains(_patterns[1]))
                 {
-                    Messages.AddMessage("Ответ не полный");
+                    if (msg.Count < 145)
+                    {
+                        Messages.AddMessage("Ответ не полный");
+                        return;
+                    }
+                    Messages.AddMessage("SIM2 ответ");
+                    if (!_sim2Added)
+                    {
+                        for (int i = 0; i < msg.Count - 1; ++i)
+                        {
+                            if (msg[i] == "AC" && msg[i + 1] == "00" && msg[i + 2] == "00")
+                            {
+                                checkIndex = i + 4;
+                                break;
+                            }
+                        }
+                        Information.Add(new SIMDataModel
+                        {
+                            RemotePort = (Convert.ToInt16(msg[checkIndex], 16) + (Convert.ToInt16(msg[checkIndex + 1], 16) << 8))
+                        });
+                        _sim2Added = true;
+                    }
+                    else
+                    {
+                        for (int i = 0; i < msg.Count - 1; ++i)
+                        {
+                            if (msg[i] == "AC" && msg[i + 1] == "00" && msg[i + 2] == "00")
+                            {
+                                checkIndex = i + 4;
+                                break;
+                            }
+                        }
+                        Information[1].RemotePort = (Convert.ToInt16(msg[checkIndex], 16) + (Convert.ToInt16(msg[checkIndex + 1], 16) << 8));
+                    }
+
+                    checkIndex = -1;
+
+                    //Поиск в массиве удалённого IP
+                    Information[1].RemoteIPAdress = "";
+                    for (int i = 0; i < msg.Count - 1; ++i)
+                    {
+                        if (msg[i] == "AB" && msg[i + 1] == "00" && msg[i + 2] == "00")
+                        {
+                            checkIndex = i + 4;
+                            size = Convert.ToInt16(msg[i + 3], 16);
+                            break;
+                        }
+                    }
+
+                    if (checkIndex != -1)
+                    {
+                        for (int i = checkIndex; i < (size + checkIndex); ++i)
+                        {
+                            if (msg[i] == "00")
+                            {
+                                break;
+                            }
+                            Information[1].RemoteIPAdress += Convert.ToChar(Convert.ToByte(msg[i], 16));
+                        }
+                    }
+
+                    size = -1;
+                    checkIndex = -1;
+
+                    //Поиск в массиве CSQ
+                    Information[1].CSQ = 0;
+                    for (int i = 0; i < msg.Count - 1; ++i)
+                    {
+                        if (msg[i] == "AF" && msg[i + 1] == "00" && msg[i + 2] == "00")
+                        {
+                            checkIndex = i + 4;
+                            //size = Convert.ToInt16(msg[i + 3], 16);
+                            break;
+                        }
+                    }
+                    if (checkIndex != -1)
+                    {
+                        Information[1].CSQ = Convert.ToInt16(msg[checkIndex], 16);
+                    }
+
+                    checkIndex = -1;
+
+                    //Поиск в массиве APN
+                    Information[1].APN = "";
+                    for (int i = 0; i < msg.Count - 1; ++i)
+                    {
+                        if (msg[i] == "82" && msg[i + 1] == "10" && msg[i + 2] == "00")
+                        {
+                            checkIndex = i + 4;
+                            size = Convert.ToInt16(msg[i + 3], 16);
+                            break;
+                        }
+                    }
+                    if (checkIndex != -1)
+                    {
+                        for (int i = checkIndex; i < (size + checkIndex); ++i)
+                        {
+                            if (msg[i] == "00")
+                            {
+                                break;
+                            }
+                            Information[1].APN += Convert.ToChar(Convert.ToByte(msg[i], 16));
+                        }
+                    }
+
+                    size = -1;
+                    checkIndex = -1;
+
+                    //Поиск в массиве IP от SIM
+                    Information[1].AcquiredIPAddress = "";
+                    for (int i = 0; i < msg.Count - 1; ++i)
+                    {
+                        if (msg[i] == "B1" && msg[i + 1] == "00" && msg[i + 2] == "00")
+                        {
+                            checkIndex = i + 4;
+                            size = Convert.ToInt16(msg[i + 3], 16);
+                            break;
+                        }
+                    }
+                    if (checkIndex != -1)
+                    {
+                        for (int i = checkIndex; i < (size + checkIndex); ++i)
+                        {
+                            Information[1].AcquiredIPAddress += Convert.ToByte(msg[i], 16).ToString();
+                            if (i < (size + checkIndex) - 1)
+                            {
+                                Information[1].AcquiredIPAddress += '.';
+                            }
+                        }
+                    }
+
+                    size = -1;
+                    checkIndex = -1;
+
+                    //Поиск в массиве Username
+                    Information[1].Username = "";
+                    for (int i = 0; i < msg.Count - 1; ++i)
+                    {
+                        if (msg[i] == "83" && msg[i + 1] == "10" && msg[i + 2] == "00")
+                        {
+                            checkIndex = i + 4;
+                            size = Convert.ToInt16(msg[i + 3], 16);
+                            break;
+                        }
+                    }
+                    if (checkIndex != -1)
+                    {
+                        for (int i = checkIndex; i < (size + checkIndex); ++i)
+                        {
+                            if (msg[i] == "00")
+                            {
+                                break;
+                            }
+                            Information[1].Username += Convert.ToChar(Convert.ToByte(msg[i], 16));
+                        }
+                    }
+
+                    size = -1;
+                    checkIndex = -1;
+
+                    //Поиск в массиве Password
+                    Information[1].Password = "";
+                    for (int i = 0; i < msg.Count - 1; ++i)
+                    {
+                        if (msg[i] == "84" && msg[i + 1] == "10" && msg[i + 2] == "00")
+                        {
+                            checkIndex = i + 4;
+                            size = Convert.ToInt16(msg[i + 3], 16);
+                            break;
+                        }
+                    }
+                    if (checkIndex != -1)
+                    {
+                        for (int i = checkIndex; i < (size + checkIndex); ++i)
+                        {
+                            if (msg[i] == "00")
+                            {
+                                break;
+                            }
+                            Information[1].Password += Convert.ToChar(Convert.ToByte(msg[i], 16));
+                        }
+                    }
                     return;
                 }
-                Messages.AddMessage("SIM2 ответ");
-                if (!_sim2Added)
-                {
-                    for (int i = 0; i < msg.Count - 1; ++i)
-                    {
-                        if (msg[i] == "AC" && msg[i + 1] == "00" && msg[i + 2] == "00")
-                        {
-                            checkIndex = i + 4;
-                            break;
-                        }
-                    }
-                    Information.Add(new SIMDataModel
-                    {
-                        RemotePort = (Convert.ToInt16(msg[checkIndex], 16) + (Convert.ToInt16(msg[checkIndex + 1], 16) << 8))
-                    });
-                    _sim2Added = true;
-                }
-                else
-                {
-                    for (int i = 0; i < msg.Count - 1; ++i)
-                    {
-                        if (msg[i] == "AC" && msg[i + 1] == "00" && msg[i + 2] == "00")
-                        {
-                            checkIndex = i + 4;
-                            break;
-                        }
-                    }
-                    Information[1].RemotePort = (Convert.ToInt16(msg[checkIndex], 16) + (Convert.ToInt16(msg[checkIndex + 1], 16) << 8));
-                }
-
-                checkIndex = -1;
-
-                //Поиск в массиве удалённого IP
-                Information[1].RemoteIPAdress = "";
-                for (int i = 0; i < msg.Count - 1; ++i)
-                {
-                    if (msg[i] == "AB" && msg[i + 1] == "00" && msg[i + 2] == "00")
-                    {
-                        checkIndex = i + 4;
-                        size = Convert.ToInt16(msg[i + 3], 16);
-                        break;
-                    }
-                }
-
-                if (checkIndex != -1)
-                {
-                    for (int i = checkIndex; i < (size + checkIndex); ++i)
-                    {
-                        if (msg[i] == "00")
-                        {
-                            break;
-                        }
-                        Information[1].RemoteIPAdress += Convert.ToChar(Convert.ToByte(msg[i], 16));
-                    }
-                }
-
-                size = -1;
-                checkIndex = -1;
-
-                //Поиск в массиве CSQ
-                Information[1].CSQ = 0;
-                for (int i = 0; i < msg.Count - 1; ++i)
-                {
-                    if (msg[i] == "AF" && msg[i + 1] == "00" && msg[i + 2] == "00")
-                    {
-                        checkIndex = i + 4;
-                        //size = Convert.ToInt16(msg[i + 3], 16);
-                        break;
-                    }
-                }
-                if (checkIndex != -1)
-                {
-                    Information[1].CSQ = Convert.ToInt16(msg[checkIndex], 16);
-                }
-
-                checkIndex = -1;
-
-                //Поиск в массиве APN
-                Information[1].APN = "";
-                for (int i = 0; i < msg.Count - 1; ++i)
-                {
-                    if (msg[i] == "82" && msg[i + 1] == "10" && msg[i + 2] == "00")
-                    {
-                        checkIndex = i + 4;
-                        size = Convert.ToInt16(msg[i + 3], 16);
-                        break;
-                    }
-                }
-                if (checkIndex != -1)
-                {
-                    for (int i = checkIndex; i < (size + checkIndex); ++i)
-                    {
-                        if (msg[i] == "00")
-                        {
-                            break;
-                        }
-                        Information[1].APN += Convert.ToChar(Convert.ToByte(msg[i], 16));
-                    }
-                }
-
-                size = -1;
-                checkIndex = -1;
-
-                //Поиск в массиве IP от SIM
-                Information[1].AcquiredIPAddress = "";
-                for (int i = 0; i < msg.Count - 1; ++i)
-                {
-                    if (msg[i] == "B1" && msg[i + 1] == "00" && msg[i + 2] == "00")
-                    {
-                        checkIndex = i + 4;
-                        size = Convert.ToInt16(msg[i + 3], 16);
-                        break;
-                    }
-                }
-                if (checkIndex != -1)
-                {
-                    for (int i = checkIndex; i < (size + checkIndex); ++i)
-                    {
-                        Information[1].AcquiredIPAddress += Convert.ToByte(msg[i], 16).ToString();
-                        if (i < (size + checkIndex) - 1)
-                        {
-                            Information[1].AcquiredIPAddress += '.';
-                        }
-                    }
-                }
-
-                size = -1;
-                checkIndex = -1;
-
-                //Поиск в массиве Username
-                Information[1].Username = "";
-                for (int i = 0; i < msg.Count - 1; ++i)
-                {
-                    if (msg[i] == "83" && msg[i + 1] == "10" && msg[i + 2] == "00")
-                    {
-                        checkIndex = i + 4;
-                        size = Convert.ToInt16(msg[i + 3], 16);
-                        break;
-                    }
-                }
-                if (checkIndex != -1)
-                {
-                    for (int i = checkIndex; i < (size + checkIndex); ++i)
-                    {
-                        if (msg[i] == "00")
-                        {
-                            break;
-                        }
-                        Information[1].Username += Convert.ToChar(Convert.ToByte(msg[i], 16));
-                    }
-                }
-
-                size = -1;
-                checkIndex = -1;
-
-                //Поиск в массиве Password
-                Information[1].Password = "";
-                for (int i = 0; i < msg.Count - 1; ++i)
-                {
-                    if (msg[i] == "84" && msg[i + 1] == "10" && msg[i + 2] == "00")
-                    {
-                        checkIndex = i + 4;
-                        size = Convert.ToInt16(msg[i + 3], 16);
-                        break;
-                    }
-                }
-                if (checkIndex != -1)
-                {
-                    for (int i = checkIndex; i < (size + checkIndex); ++i)
-                    {
-                        if (msg[i] == "00")
-                        {
-                            break;
-                        }
-                        Information[1].Password += Convert.ToChar(Convert.ToByte(msg[i], 16));
-                    }
-                }
-                return;
+            }
+            catch (System.ArgumentOutOfRangeException)
+            {
+                Messages.AddMessage("Считывание данных произошло неккоректно, повторите попытку");
             }
             #endregion
             //return "default";
@@ -546,7 +569,7 @@ namespace FaultIndicator_MainIPConfig.BaseBlock
                 return;
             }
 
-            string[] saveString = new string [Information[0].APN.Length];
+            string[] saveString = new string[Information[0].APN.Length];
 
             int insertionIndex = -1;
             int lengthIndex = -1;
@@ -747,7 +770,7 @@ namespace FaultIndicator_MainIPConfig.BaseBlock
                     "00",
                     "00",
                     "01",
-                    "0E",
+                    "00",
                     "30",
                     "00",
                     "00",
@@ -790,13 +813,59 @@ namespace FaultIndicator_MainIPConfig.BaseBlock
                 }
                 b = k;
                 //k += Information[0].RemoteIPAdress.Length;
-                for (int i = k; k < b + 20; ++k)
+                for (; k < b + 20; ++k)
                 {
                     Request[k] = $"00";
                 }
 
-                Request[93] = $"{Information[0].RemotePort & 255:X2}";
-                Request[94] = $"{(Information[0].RemotePort >> 8) & 255:X2}";
+                for (int i = 0; i < Request.Count - 1; ++i)
+                {
+                    if (Request[i] == "2C" && Request[i + 1] == "00" && Request[i + 2] == "00")
+                    {
+                        insertionIndex = i + 4;
+                        break;
+                    }
+                }
+
+                if (insertionIndex != -1)
+                {
+                    Request[insertionIndex] = $"{Information[0].RemotePort & 255:X2}";
+                    Request[insertionIndex + 1] = $"{(Information[0].RemotePort >> 8) & 255:X2}";
+                }
+
+                insertionIndex = -1;
+
+                for (int i = 0; i < Request.Count - 1; ++i)
+                {
+                    if (Request[i] == "AB" && Request[i + 1] == "00" && Request[i + 2] == "00")
+                    {
+                        insertionIndex = i + 4;
+                        break;
+                    }
+                }
+
+                if (insertionIndex != -1)
+                {
+                    for (int i = 0; i < Information[1].RemoteIPAdress.Length; ++i)
+                    {
+                        Request[insertionIndex] = $"{Convert.ToByte(Information[1].RemoteIPAdress[i]):X2}";
+                        ++insertionIndex;
+                    }
+                }
+
+               //b = insertionIndex;
+
+                for (int i = insertionIndex; i < insertionIndex + 20; ++i)
+                {
+                    Request[i] = $"00";
+                }
+
+                insertionIndex = -1;
+                //Request[93] = $"{Information[0].RemotePort & 255:X2}";
+                //Request[94] = $"{(Information[0].RemotePort >> 8) & 255:X2}";
+
+                Request[1] = $"{(Request.Count - 2):X2}";
+                Request[18] = $"{(Request.Count - 19):X2}";
 
                 Sender.SendHEXMessage(string.Join(" ", Request));
                 Messages.AddSentMessage(string.Join(" ", Request));
@@ -914,28 +983,28 @@ namespace FaultIndicator_MainIPConfig.BaseBlock
                 "82",
                 "10",
                 "00",
-                "05",
-                "63",
-                "6D",
-                "6E",
-                "65",
-                "74",
+                "00", //длина APN, нулёвка по дефолту
+                //"63", //начало при 5
+                //"6D",
+                //"6E",
+                //"65",
+                //"74", //конец при 5
                 "83",
                 "10",
                 "00",
-                "04",
-                "63",
-                "61",
-                "72",
-                "64",
+                "00", //длина username, нулёвка по дфеолту
+                //"63", //начало при 4
+                //"61",
+                //"72",
+                //"64", //конец при 4
                 "84",
                 "10",
                 "00",
-                "04",
-                "63",
-                "61",
-                "72",
-                "64",
+                "00", //длина password, нулёвка по дфеолту
+                //"63",
+                //"61",
+                //"72",
+                //"64",
                 "88",
                 "10",
                 "00",
@@ -1110,5 +1179,37 @@ namespace FaultIndicator_MainIPConfig.BaseBlock
 
             }).Start();
         }
+
+        public void ExitDebug()
+        {
+            new Thread(() =>
+            {
+                Request = new List<string>
+                {
+                    "61",
+                    "74",
+                    "2B",
+                    "6C",
+                    "6F",
+                    "67",
+                    "6F",
+                    "66",
+                    "66",
+                    "0D",
+                    "0A",
+                    "0D",
+                    "0A",
+                };
+
+                Sender.SendHEXMessage(string.Join(" ", Request));
+                Messages.AddSentMessage(string.Join(" ", Request));
+
+                Thread.Sleep(1000);
+
+            }).Start();
+        }
     }
 }
+
+
+// 61 74 2B 6C 6F 67 6F 66 66 0D 0A 0D 0A debug close

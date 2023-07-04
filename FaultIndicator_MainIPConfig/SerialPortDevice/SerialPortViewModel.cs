@@ -67,8 +67,8 @@ namespace FaultIndicator_MainIPConfig.SerialPortDevice
             ConnectedPort = "None";
             Port = new SerialPort
             {
-                ReadTimeout = 1000,
-                WriteTimeout = 1000
+                ReadTimeout = 5000,
+                WriteTimeout = 5000
             };
             Settings = new PortSettingsViewModel();
 
