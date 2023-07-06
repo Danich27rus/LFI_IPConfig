@@ -11,7 +11,6 @@ using System.Windows.Documents;
 using System.Windows.Interop;
 using FaultIndicator_MainIPConfig.SerialPMessages;
 using FaultIndicator_MainIPConfig.SerialPortDevice;
-using Microsoft.VisualBasic;
 using TheRFramework.Utilities;
 
 namespace FaultIndicator_MainIPConfig.BaseBlock
@@ -24,8 +23,11 @@ namespace FaultIndicator_MainIPConfig.BaseBlock
 
         private string[] _patterns =
 {
-            "31 00 00 04",        //SIM1
-            "B1 00 00 04",        //SIM2
+            "31 00 00 04",              //SIM1
+            "B1 00 00 04",              //SIM2
+            "68 04 0B",                 //Подтверждение инциализации
+            "68 04 01",                 //Подтверждение чтения/записи
+            "6C 6F 67 6F 66 66 0D 0A"   //logoff
         };
 
         public List<string> Request
@@ -79,6 +81,7 @@ namespace FaultIndicator_MainIPConfig.BaseBlock
 
             if (string.IsNullOrEmpty(BlockResponse))
             {
+                Messages.AddMessage("В ответ ничего не пришло");
                 return;// "В ответ ничего не пришло";
             }
 
@@ -92,10 +95,10 @@ namespace FaultIndicator_MainIPConfig.BaseBlock
                 {
                     if (msg.Count < 145)
                     {
-                        Messages.AddMessage("Ответ не полный");
+                        Messages.AddReceivedMessage("Ответ не полный");
                         return;
                     }
-                    Messages.AddMessage("SIM1 ответ");
+                    Messages.AddReceivedMessage($"SIM1 ответ: {BlockResponse}");
                     if (!_sim1Added)
                     {
                         for (int i = 0; i < msg.Count - 1; ++i)
@@ -277,7 +280,7 @@ namespace FaultIndicator_MainIPConfig.BaseBlock
             }
             catch (System.ArgumentOutOfRangeException)
             {
-                Messages.AddMessage("Считывание данных произошло неккоректно, повторите попытку");
+                Messages.AddReceivedMessage("Считывание данных произошло неккоректно, повторите попытку");
             }
 
             #endregion
@@ -290,10 +293,10 @@ namespace FaultIndicator_MainIPConfig.BaseBlock
                 {
                     if (msg.Count < 145)
                     {
-                        Messages.AddMessage("Ответ не полный");
+                        Messages.AddReceivedMessage("Ответ не полный");
                         return;
                     }
-                    Messages.AddMessage("SIM2 ответ");
+                    Messages.AddReceivedMessage($"SIM2 ответ: {BlockResponse}");
                     if (!_sim2Added)
                     {
                         for (int i = 0; i < msg.Count - 1; ++i)
@@ -478,6 +481,21 @@ namespace FaultIndicator_MainIPConfig.BaseBlock
                 Messages.AddMessage("Считывание данных произошло неккоректно, повторите попытку");
             }
             #endregion
+
+            if (BlockResponse.Contains(_patterns[2]))
+            {
+                Messages.AddReceivedMessage($"Подтверждение инициализации: {BlockResponse}");
+            }
+
+            if (BlockResponse.Contains(_patterns[3]))
+            {
+                Messages.AddReceivedMessage($"Подтверждение чтения/записи: {BlockResponse}");
+            }
+
+            if (BlockResponse.Contains(_patterns[4]))
+            {
+                Messages.AddReceivedMessage($"Базовый блок получил запрос на выход из дебаг режима: {BlockResponse}");
+            }
             //return "default";
         }
 
@@ -526,7 +544,7 @@ namespace FaultIndicator_MainIPConfig.BaseBlock
                         };
 
                     Sender.SendHEXMessage(string.Join(" ", Request));
-                    Messages.AddSentMessage(string.Join(" ", Request));
+                    Messages.AddSentMessage("Запрос на инициализацию: " + string.Join(" ", Request));
                     Sender.InitializationPackage = false;
 
                     Thread.Sleep(500);
@@ -555,7 +573,7 @@ namespace FaultIndicator_MainIPConfig.BaseBlock
                 };
 
                 Sender.SendHEXMessage(string.Join(" ", Request));
-                Messages.AddSentMessage(string.Join(" ", Request));
+                Messages.AddSentMessage("Запрос на чтение данных: " + string.Join(" ", Request));
 
                 Thread.Sleep(500);
             }).Start();
@@ -868,7 +886,7 @@ namespace FaultIndicator_MainIPConfig.BaseBlock
                 Request[18] = $"{(Request.Count - 19):X2}";
 
                 Sender.SendHEXMessage(string.Join(" ", Request));
-                Messages.AddSentMessage(string.Join(" ", Request));
+                Messages.AddSentMessage("Запись первой половины данных: " + string.Join(" ", Request));
 
                 Thread.Sleep(4000);
 
@@ -1172,7 +1190,7 @@ namespace FaultIndicator_MainIPConfig.BaseBlock
 
 
                 Sender.SendHEXMessage(string.Join(" ", Request));
-                Messages.AddSentMessage(string.Join(" ", Request));
+                Messages.AddSentMessage("Запись второй половины данных: " + string.Join(" ", Request));
                 Thread.Sleep(1000);
 
                 #endregion
@@ -1202,7 +1220,7 @@ namespace FaultIndicator_MainIPConfig.BaseBlock
                 };
 
                 Sender.SendHEXMessage(string.Join(" ", Request));
-                Messages.AddSentMessage(string.Join(" ", Request));
+                Messages.AddSentMessage("Запрос на выход из дебаг режима: " + string.Join(" ", Request));
 
                 Thread.Sleep(1000);
 

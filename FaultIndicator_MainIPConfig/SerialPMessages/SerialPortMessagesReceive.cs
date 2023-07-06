@@ -82,7 +82,7 @@ namespace FaultIndicator_MainIPConfig.SerialPMessages
                                     //message = hexConverter.ToHexString(message);
                                     BaseBlock.BlockResponse = message;
                                     BaseBlock.ParseCommand();
-                                    Messages.AddReceivedMessage(message);
+                                    //Messages.AddReceivedMessage(message);
                                     message = "";
                                 }
                             /*}
