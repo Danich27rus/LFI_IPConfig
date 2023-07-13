@@ -586,7 +586,6 @@ namespace FaultIndicator_MainIPConfig.BaseBlock
                 Messages.AddMessage("Порт не открыт, не удалось отправить сообщение");
                 return;
             }
-
             string[] saveString = new string[Information[0].APN.Length];
 
             int insertionIndex = -1;
