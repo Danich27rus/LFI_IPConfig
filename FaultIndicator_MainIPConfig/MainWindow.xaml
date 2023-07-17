@@ -181,6 +181,9 @@
                             <MultiDataTrigger>
                                 <MultiDataTrigger.Conditions>
                                     <Condition Binding="{Binding Path=(Validation.HasError), ElementName=FirstRemotePorttextBox}" Value="False"/>
+                                    <Condition Binding="{Binding Path=(Validation.HasError), ElementName=SecondRemotePorttextBox}" Value="False"/>
+                                    <Condition Binding="{Binding Path=(Validation.HasError), ElementName=FirstRemoteIPAddresstextBox}" Value="False"/>
+                                    <Condition Binding="{Binding Path=(Validation.HasError), ElementName=SecondRemoteIPAddresstextBox}" Value="False"/>
                                 </MultiDataTrigger.Conditions>
                                 <Setter Property="IsEnabled" Value="True"/>
                             </MultiDataTrigger>
@@ -225,20 +228,36 @@
                             <TextBlock x:Name="FirstSIMUsername" HorizontalAlignment="Left" TextWrapping="Wrap" Margin="5,0,0,0" Text="Имя пользователя" VerticalAlignment="Center" Grid.Row="5"/>
                             <TextBlock x:Name="FirstSIMPassword" HorizontalAlignment="Left" TextWrapping="Wrap" Margin="5,0,0,0" Text="Пароль" VerticalAlignment="Center" Grid.Row="6"/>
                             <!--хард-код коллекции-->
-                            <TextBox x:Name="FirstRemoteIPAddresstextBox" BorderBrush="#FF2A2A2A" HorizontalAlignment="Right" TextWrapping="Wrap" Text="{Binding BlockData.Information[0].RemoteIPAdress, TargetNullValue='', StringFormat=d, UpdateSourceTrigger=PropertyChanged}" UI:Masking.Mask="^[0-9.]+$" VerticalAlignment="Center" Width="140" Grid.Row="0" Margin="0,0,10,0"/>
+                            <TextBox x:Name="FirstRemoteIPAddresstextBox" BorderBrush="#FF2A2A2A" HorizontalAlignment="Right" TextWrapping="Wrap" UI:Masking.Mask="^[0-9.]+$" VerticalAlignment="Center" Width="140" Grid.Row="0" Margin="0,0,10,0" Style="{StaticResource CustomTextBoxTextStyle}" Validation.ErrorTemplate="{StaticResource validationTemplate}">
+                                <TextBox.Text>
+                                    <Binding Path="BlockData.Information[0].RemoteIPAdress" TargetNullValue="" StringFormat="d" UpdateSourceTrigger="PropertyChanged">
+                                        <Binding.ValidationRules>
+                                            <UI:FieldValidationRule Max="255" Min="0" Type="IP"/>
+                                        </Binding.ValidationRules>
+                                    </Binding>
+                                </TextBox.Text>
+                            </TextBox>
                             <TextBox x:Name="FirstRemotePorttextBox" BorderBrush="#FF2A2A2A" HorizontalAlignment="Right" TextWrapping="Wrap" UI:Masking.Mask="^[0-9]+$" VerticalAlignment="Center" Width="80" Grid.Row="1" Margin="0,0,10,0" Style="{StaticResource CustomTextBoxTextStyle}" Validation.ErrorTemplate="{StaticResource validationTemplate}">
                                 <TextBox.Text>
                                     <Binding Path="BlockData.Information[0].RemotePort" TargetNullValue="" StringFormat="d" UpdateSourceTrigger="PropertyChanged">
                                         <Binding.ValidationRules>
-                                            <UI:FieldValidationRule Max="65535" Min="0"/>
+                                            <UI:FieldValidationRule Max="65535" Min="0" Type="Port"/>
                                         </Binding.ValidationRules>
                                     </Binding>
                                 </TextBox.Text>
                                 <!--Text="{Binding BlockData.Information[0].RemotePort, TargetNullValue='', StringFormat=d, UpdateSourceTrigger=PropertyChanged}" -->
                             </TextBox>
-                            <TextBox x:Name="FirstSIMCSQtextBox" BorderBrush="#FF2A2A2A" HorizontalAlignment="Right" TextWrapping="Wrap" Text="{Binding BlockData.Information[0].CSQ, TargetNullValue='', StringFormat=d, UpdateSourceTrigger=PropertyChanged}" UI:Masking.Mask="^[0-9]+$" VerticalAlignment="Center" Width="80" Grid.Row="2" Margin="0,0,10,0"/>
+                            <TextBox x:Name="FirstSIMCSQtextBox" BorderBrush="#FF2A2A2A" HorizontalAlignment="Right" TextWrapping="Wrap" IsReadOnly="True" Text="{Binding BlockData.Information[0].CSQ, TargetNullValue='', StringFormat=d, UpdateSourceTrigger=PropertyChanged}" UI:Masking.Mask="^[0-9]+$" VerticalAlignment="Center" Width="80" Grid.Row="2" Margin="0,0,10,0"/>
                             <TextBox x:Name="FirstSIMAPNtextBox" BorderBrush="#FF2A2A2A" HorizontalAlignment="Right" TextWrapping="Wrap" Text="{Binding BlockData.Information[0].APN, TargetNullValue='', StringFormat=d, UpdateSourceTrigger=PropertyChanged}" UI:Masking.Mask="^[A-Za-z.]+$" VerticalAlignment="Center" Width="80" Grid.Row="3" Margin="0,0,10,0"/>
-                            <TextBox x:Name="FirstSIMIPAddresstextBox" BorderBrush="#FF2A2A2A" HorizontalAlignment="Right" TextWrapping="Wrap" Text="{Binding BlockData.Information[0].AcquiredIPAddress, TargetNullValue='', StringFormat=d, UpdateSourceTrigger=PropertyChanged}" UI:Masking.Mask="^[0-9.]+$" VerticalAlignment="Center" Width="140" Grid.Row="4" Margin="0,0,10,0"/>
+                            <TextBox x:Name="FirstSIMIPAddresstextBox" BorderBrush="#FF2A2A2A" HorizontalAlignment="Right" TextWrapping="Wrap" UI:Masking.Mask="^[0-9.]+$" VerticalAlignment="Center" Width="140" Grid.Row="4" Margin="0,0,10,0" IsReadOnly="True" Style="{StaticResource CustomTextBoxTextStyle}" Validation.ErrorTemplate="{StaticResource validationTemplate}">
+                                <TextBox.Text>
+                                    <Binding Path="BlockData.Information[0].AcquiredIPAddress" TargetNullValue="" StringFormat="d" UpdateSourceTrigger="PropertyChanged">
+                                        <Binding.ValidationRules>
+                                            <UI:FieldValidationRule Max="255" Min="0" Type="IP"/>
+                                        </Binding.ValidationRules>
+                                    </Binding>
+                                </TextBox.Text>
+                            </TextBox>
                             <TextBox x:Name="FirstSIMUsernametextBox" BorderBrush="#FF2A2A2A" HorizontalAlignment="Right" TextWrapping="Wrap" Text="{Binding BlockData.Information[0].Username, TargetNullValue='', StringFormat=d, UpdateSourceTrigger=PropertyChanged}" UI:Masking.Mask="^[A-Za-z.]+$" VerticalAlignment="Center" Width="80" Grid.Row="5" Margin="0,0,10,0"/>
                             <TextBox x:Name="FirstSIMPasswordtextBox" BorderBrush="#FF2A2A2A" HorizontalAlignment="Right" TextWrapping="Wrap" Text="{Binding BlockData.Information[0].Password, TargetNullValue='', StringFormat=d, UpdateSourceTrigger=PropertyChanged}" UI:Masking.Mask="^[A-Za-z.]+$" VerticalAlignment="Center" Width="80" Grid.Row="6" Margin="0,0,10,0"/>
                         </Grid>
@@ -262,11 +281,35 @@
                             <TextBlock x:Name="SecondSIMUsername" HorizontalAlignment="Left" TextWrapping="Wrap" Margin="5,0,0,0" Text="Имя пользователя" VerticalAlignment="Center" Grid.Row="5"/>
                             <TextBlock x:Name="SecondSIMPassword" HorizontalAlignment="Left" TextWrapping="Wrap" Margin="5,0,0,0" Text="Пароль" VerticalAlignment="Center" Grid.Row="6"/>
                             <!--хард-код коллекции-->
-                            <TextBox x:Name="SecondRemoteIPAddresstextBox" BorderBrush="#FF2A2A2A" HorizontalAlignment="Right" TextWrapping="Wrap" Text="{Binding BlockData.Information[1].RemoteIPAdress, TargetNullValue='', StringFormat=d, UpdateSourceTrigger=PropertyChanged}" UI:Masking.Mask="^[0-9.]+$" VerticalAlignment="Center" Width="140" Grid.Row="0" Margin="0,0,10,0"/>
-                            <TextBox x:Name="SecondRemotePorttextBox" BorderBrush="#FF2A2A2A" HorizontalAlignment="Right" TextWrapping="Wrap" Text="{Binding BlockData.Information[1].RemotePort, TargetNullValue='', StringFormat=d, UpdateSourceTrigger=PropertyChanged}" UI:Masking.Mask="^[0-9]+$" VerticalAlignment="Center" Width="80" Grid.Row="1" Margin="0,0,10,0"/>
-                            <TextBox x:Name="SecondSIMCSQtextBox" BorderBrush="#FF2A2A2A" HorizontalAlignment="Right" TextWrapping="Wrap" Text="{Binding BlockData.Information[1].CSQ, TargetNullValue='', StringFormat=d, UpdateSourceTrigger=PropertyChanged}" UI:Masking.Mask="^[0-9]+$" VerticalAlignment="Center" Width="80" Grid.Row="2" Margin="0,0,10,0"/>
+                            <TextBox x:Name="SecondRemoteIPAddresstextBox" BorderBrush="#FF2A2A2A" HorizontalAlignment="Right" TextWrapping="Wrap" UI:Masking.Mask="^[0-9.]+$" VerticalAlignment="Center" Width="140" Grid.Row="0" Margin="0,0,10,0" Style="{StaticResource CustomTextBoxTextStyle}" Validation.ErrorTemplate="{StaticResource validationTemplate}">
+                                <TextBox.Text>
+                                    <Binding Path="BlockData.Information[1].RemoteIPAdress" TargetNullValue="" StringFormat="d" UpdateSourceTrigger="PropertyChanged">
+                                        <Binding.ValidationRules>
+                                            <UI:FieldValidationRule Max="255" Min="0" Type="IP"/>
+                                        </Binding.ValidationRules>
+                                    </Binding>
+                                </TextBox.Text>
+                            </TextBox>
+                            <TextBox x:Name="SecondRemotePorttextBox" BorderBrush="#FF2A2A2A" HorizontalAlignment="Right" TextWrapping="Wrap" UI:Masking.Mask="^[0-9]+$" VerticalAlignment="Center" Width="80" Grid.Row="1" Margin="0,0,10,0" Style="{StaticResource CustomTextBoxTextStyle}" Validation.ErrorTemplate="{StaticResource validationTemplate}">
+                                <TextBox.Text>
+                                    <Binding Path="BlockData.Information[1].RemotePort" TargetNullValue="" StringFormat="d" UpdateSourceTrigger="PropertyChanged">
+                                        <Binding.ValidationRules>
+                                            <UI:FieldValidationRule Max="65535" Min="0" Type="Port"/>
+                                        </Binding.ValidationRules>
+                                    </Binding>
+                                </TextBox.Text>
+                            </TextBox>
+                            <TextBox x:Name="SecondSIMCSQtextBox" BorderBrush="#FF2A2A2A" HorizontalAlignment="Right" TextWrapping="Wrap" IsReadOnly="True" Text="{Binding BlockData.Information[1].CSQ, TargetNullValue='', StringFormat=d, UpdateSourceTrigger=PropertyChanged}" UI:Masking.Mask="^[0-9]+$" VerticalAlignment="Center" Width="80" Grid.Row="2" Margin="0,0,10,0"/>
                             <TextBox x:Name="SecondSIMAPNtextBox" BorderBrush="#FF2A2A2A" HorizontalAlignment="Right" TextWrapping="Wrap" Text="{Binding BlockData.Information[1].APN, TargetNullValue='', StringFormat=d, UpdateSourceTrigger=PropertyChanged}" UI:Masking.Mask="^[A-Za-z.]+$" VerticalAlignment="Center" Width="80" Grid.Row="3" Margin="0,0,10,0"/>
-                            <TextBox x:Name="SecondSIMIPAddresstextBox" BorderBrush="#FF2A2A2A" HorizontalAlignment="Right" TextWrapping="Wrap" Text="{Binding BlockData.Information[1].AcquiredIPAddress, TargetNullValue='', StringFormat=d, UpdateSourceTrigger=PropertyChanged}" UI:Masking.Mask="^[0-9.]+$" VerticalAlignment="Center" Width="140" Grid.Row="4" Margin="0,0,10,0"/>
+                            <TextBox x:Name="SecondSIMIPAddresstextBox" BorderBrush="#FF2A2A2A" HorizontalAlignment="Right" TextWrapping="Wrap" UI:Masking.Mask="^[0-9.]+$" VerticalAlignment="Center" Width="140" Grid.Row="4" Margin="0,0,10,0" IsReadOnly="True" Style="{StaticResource CustomTextBoxTextStyle}" Validation.ErrorTemplate="{StaticResource validationTemplate}">
+                                <TextBox.Text>
+                                    <Binding Path="BlockData.Information[1].AcquiredIPAddress" TargetNullValue="" StringFormat="d" UpdateSourceTrigger="PropertyChanged">
+                                        <Binding.ValidationRules>
+                                            <UI:FieldValidationRule Max="255" Min="0" Type="IP"/>
+                                        </Binding.ValidationRules>
+                                    </Binding>
+                                </TextBox.Text>
+                            </TextBox>
                             <TextBox x:Name="SecondSIMUsernametextBox" BorderBrush="#FF2A2A2A" HorizontalAlignment="Right" TextWrapping="Wrap" Text="{Binding BlockData.Information[1].Username, TargetNullValue='', StringFormat=d, UpdateSourceTrigger=PropertyChanged}" UI:Masking.Mask="^[A-Za-z.]+$" VerticalAlignment="Center" Width="80" Grid.Row="5" Margin="0,0,10,0"/>
                             <TextBox x:Name="SecondSIMPasswordtextBox" BorderBrush="#FF2A2A2A" HorizontalAlignment="Right" TextWrapping="Wrap" Text="{Binding BlockData.Information[1].Password, TargetNullValue='', StringFormat=d, UpdateSourceTrigger=PropertyChanged}" UI:Masking.Mask="^[A-Za-z.]+$" VerticalAlignment="Center" Width="80" Grid.Row="6" Margin="0,0,10,0"/>
                         </Grid>

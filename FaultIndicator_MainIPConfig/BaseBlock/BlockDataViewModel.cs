@@ -205,7 +205,7 @@ namespace FaultIndicator_MainIPConfig.BaseBlock
                     Information[0].AcquiredIPAddress = "";
                     for (int i = 0; i < msg.Count - 1; ++i)
                     {
-                        if (msg[i] == "31" && msg[i + 1] == "00" && msg[i + 2] == "00")
+                        if ((msg[i] == "31" && msg[i + 1] == "00" && msg[i + 2] == "00") && i > 50)
                         {
                             checkIndex = i + 4;
                             size = Convert.ToInt16(msg[i + 3], 16);
@@ -893,7 +893,7 @@ namespace FaultIndicator_MainIPConfig.BaseBlock
                 {
                 "68",
                 "00", //длина сообщения с контрольными полями
-                "EC",
+                "04",
                 "00",
                 "6E",
                 "00",
